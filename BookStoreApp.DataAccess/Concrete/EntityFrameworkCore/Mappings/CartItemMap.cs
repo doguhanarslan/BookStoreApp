@@ -18,14 +18,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore.Mappings
 
 
             builder.Property(b => b.BookId).HasColumnName("BookId");
-            builder.Property(b => b.BookTitle).HasColumnName("BookTitle");
-            builder.Property(b => b.BookDescription).HasColumnName("BookDescription");
-            builder.Property(b => b.Price).HasColumnName("Price");
             builder.Property(b => b.Quantity).HasColumnName("Quantity");
-            builder.Property(b => b.BookAuthor).HasColumnName("BookAuthor");
-            builder.Property(b => b.BookImage).HasColumnName("BookImage");
-
-
         }
     }
 }

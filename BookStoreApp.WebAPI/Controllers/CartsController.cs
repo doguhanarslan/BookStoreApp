@@ -18,9 +18,11 @@ namespace BookStoreApp.WebAPI.Controllers
         [HttpPost("add")]
         public IActionResult AddToCart(int bookId)
         {
+            string cartSessionId = HttpContext.Session.GetString("CartSessionId") ?? Guid.NewGuid().ToString();
+            HttpContext.Session.SetString("CartSessionId", cartSessionId);
             try
             {
-                _cartService.AddToCart(bookId);
+                _cartService.AddToCart(bookId, cartSessionId);
                 return Ok(new { Message = "Book added to cart successfully." });
             }
             catch (Exception ex)
@@ -29,11 +31,19 @@ namespace BookStoreApp.WebAPI.Controllers
             }
         }
 
-        [HttpGet("items")] 
-        public IActionResult GetCartItems()
+        [HttpGet("sessionId")]
+        public IActionResult GetCartSessionId()
         {
-            var items = _cartService.GetCartItems();
-            return Ok(items);
+            string cartSessionId = HttpContext.Session.GetString("CartSessionId") ?? Guid.NewGuid().ToString();
+            HttpContext.Session.SetString("CartSessionId", cartSessionId);
+            return Ok(new { CartSessionId = cartSessionId });
+        }
+
+        [HttpGet("items")]
+        public IActionResult GetCartDetails(string sessionId)
+        {
+            var cartItems = _cartService.GetCartItemsForSession(sessionId);
+            return Ok(cartItems);
         }
 
 
@@ -46,9 +56,9 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpGet("GetTotalPrice")]
-        public IActionResult GetTotalPrice()
+        public IActionResult GetTotalPrice(string sessionId)
         {
-            var totalPrice = _cartService.GetTotalPrice();
+            var totalPrice = _cartService.GetTotalPrice(sessionId);
             return Ok(totalPrice);
         }
     }

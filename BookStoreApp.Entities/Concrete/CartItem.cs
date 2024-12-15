@@ -10,19 +10,11 @@ namespace BookStoreApp.Entities.Concrete
     public class CartItem:IEntity
     {
         public int Id { get; set; }
-
         public int BookId { get; set; }
-
-        public string BookTitle { get; set; }
-
-
-        public string BookDescription { get; set; }
-
-        public string BookImage { get; set; }
+        public int Quantity { get; set; }
+        public string CartSessionId { get; set; }
 
         public double Price { get; set; }
-
-        public int Quantity { get; set; }
-        public string BookAuthor { get; set; }
+        public virtual Book Book { get; set; }
     }
 }

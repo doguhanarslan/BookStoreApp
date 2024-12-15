@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BookStoreApp.Business.Abstract;
 using BookStoreApp.DataAccess.Abstract;
+using BookStoreApp.Entities.ComplexTypes;
 using BookStoreApp.Entities.Concrete;
 
 namespace BookStoreApp.Business.Concrete.Managers
@@ -19,35 +20,43 @@ namespace BookStoreApp.Business.Concrete.Managers
             _bookDal = bookDal;
         }
 
-        public List<Cart> GetAllCarts()
+        public void AddToCart(int bookId, string cartSessionId)
         {
-            return null;
-        }
-
-        public CartItem AddToCart(int bookId)
-        {
-            var book = _bookDal.GetAllBooks().FirstOrDefault(b => b.BookId == bookId);
-            //var book = _bookDal.GetAllBooks();
-            var bookCart = GetBookCartById(bookId);
-            CartItem cartItem = new CartItem
+            var existingCartItem = _cartDal.GetCartItem(bookId, cartSessionId);
+            var book = _bookDal.GetBookById(bookId);
+            if (existingCartItem != null)
             {
-                BookId = book.BookId,
-                BookTitle = book.BookTitle,
-                BookImage = book.BookImage,
-                BookDescription = book.BookDescription,
-                BookAuthor = book.AuthorName,
-                Price = Convert.ToDouble(book.BookPrice),
-                Quantity = 1
-            };
-            return bookCart != null ? UpdateQuantity(bookCart) : _cartDal.Add(cartItem);
+                
+                existingCartItem.Quantity += 1;
+                existingCartItem.Price += book.Price; 
+                _cartDal.Update(existingCartItem);
+            }
+            else
+            {
+                
+                var cartItem = new CartItem
+                {
+                    CartSessionId = cartSessionId,
+                    BookId = book.Id,
+                    Quantity = 1,
+                    Price = book.Price
+                };
+
+                _cartDal.Add(cartItem);
+            }
         }
 
         public CartItem UpdateQuantity(CartItem cartItem)
         {
-            cartItem.Quantity += 1;
-            cartItem.Price += _bookDal.GetBookById(cartItem.BookId).Price;
-            return _cartDal.Update(cartItem);
+            throw new NotImplementedException();
         }
+
+        //public CartItemDetails UpdateQuantity(CartItemDetails cartItem)
+        //{
+        //    cartItem.Quantity += 1;
+        //    cartItem.Price += _bookDal.GetBookById(cartItem.BookId).Price;
+        //    return _cartDal.Update(cartItem);
+        //}
 
 
         public CartItem GetBookCartById(int bookId)
@@ -55,17 +64,17 @@ namespace BookStoreApp.Business.Concrete.Managers
             return _cartDal.Get(cart => cart.BookId == bookId);
         }
 
-        public List<CartItem> GetCartItems()
+        public List<CartItemDetails> GetCartItemsForSession(string sessionId)
         {
-            return _cartDal.GetAll();
+            return _cartDal.GetCartItemsForSession(sessionId);
         }
 
-        public decimal GetTotalPrice()
+        public decimal GetTotalPrice(string cartSessionId)
         {
             double totalPrice = 0;
-            foreach (var cart in _cartDal.GetAll())
+            foreach (var cart in _cartDal.GetCartItemsForSession(cartSessionId))
             {
-                totalPrice += Convert.ToDouble(cart.Price);
+                totalPrice += cart.Price;
             }
             return Convert.ToDecimal(totalPrice);
         }

@@ -33,6 +33,11 @@ namespace BookStoreApp.Business.Concrete.Managers
             return _bookDal.Update(book);
         }
 
+        public Book GetBookByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         public Book? GetBookById(int id)
         {
             return _bookDal.Get(b => b.Id == id);
