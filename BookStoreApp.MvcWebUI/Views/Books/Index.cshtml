@@ -1,0 +1,25 @@
+﻿@model List<BookStoreApp.Entities.ComplexTypes.BookDetails>
+
+<h1>Book List</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Publisher</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var book in Model)
+    {
+        <tr>
+            <td>@book.BookId</td>
+            <td>@book.BookTitle</td>
+            <td>@book.BookPrice ₺</td>
+            <td>@book.AuthorName</td>
+        </tr>
+    }
+    </tbody>
+</table>
