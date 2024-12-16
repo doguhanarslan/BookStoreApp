@@ -13,6 +13,8 @@ builder.Services.AddScoped<IBookDal, EfBookDal>();
 builder.Services.AddScoped<IBookService, BookManager>();
 builder.Services.AddScoped<ICartDal, EfCartDal>();
 builder.Services.AddScoped<ICartService, CartManager>();
+builder.Services.AddScoped<IUserDal, EfUserDal>();
+builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<DbContext, BookstoreContext>();
 builder.Services.AddCors(options =>
 {

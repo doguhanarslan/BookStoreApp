@@ -14,15 +14,17 @@ namespace BookStoreApp.Business.Concrete.Managers
     {
         private readonly ICartDal _cartDal;
         private readonly IBookDal _bookDal;
-        public CartManager(ICartDal cartDal, IBookService bookService, IBookDal bookDal)
+        private readonly IUserDal _userDal;
+        public CartManager(ICartDal cartDal, IBookService bookService, IBookDal bookDal, IUserDal userDal)
         {
             _cartDal = cartDal;
             _bookDal = bookDal;
+            _userDal = userDal;
         }
 
-        public void AddToCart(int bookId, string cartSessionId)
+        public void AddToCart(int bookId, int userId)
         {
-            var existingCartItem = _cartDal.GetCartItem(bookId, cartSessionId);
+            var existingCartItem = _cartDal.GetCartItem(bookId, userId);
             var book = _bookDal.GetBookById(bookId);
             if (existingCartItem != null)
             {
@@ -36,7 +38,7 @@ namespace BookStoreApp.Business.Concrete.Managers
                 
                 var cartItem = new CartItem
                 {
-                    CartSessionId = cartSessionId,
+                    UserId = userId,
                     BookId = book.Id,
                     Quantity = 1,
                     Price = book.Price
@@ -66,13 +68,28 @@ namespace BookStoreApp.Business.Concrete.Managers
 
         public List<CartItemDetails> GetCartItemsForSession(string sessionId)
         {
-            return _cartDal.GetCartItemsForSession(sessionId);
+            throw new NotImplementedException();
         }
 
-        public decimal GetTotalPrice(string cartSessionId)
+        //public List<CartItemDetails> GetCartItemsForSession(string sessionId)
+        //{
+        //    return _cartDal.GetCartItemsForSession(sessionId);
+        //}
+
+        public List<CartItemDetails> GetCartItemsForUser(int userId)
+        {
+            var user = _userDal.GetById(userId);
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user), "User not found");
+            }
+            return _cartDal.GetCartItemsForUserId(user.Id);
+        }
+
+        public decimal GetTotalPrice(int userId)
         {
             double totalPrice = 0;
-            foreach (var cart in _cartDal.GetCartItemsForSession(cartSessionId))
+            foreach (var cart in _cartDal.GetCartItemsForUserId(userId))
             {
                 totalPrice += cart.Price;
             }

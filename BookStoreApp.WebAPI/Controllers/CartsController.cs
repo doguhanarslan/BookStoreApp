@@ -16,13 +16,12 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddToCart(int bookId)
+        public IActionResult AddToCart(int bookId,int userId)
         {
-            string cartSessionId = HttpContext.Session.GetString("CartSessionId") ?? Guid.NewGuid().ToString();
-            HttpContext.Session.SetString("CartSessionId", cartSessionId);
+            
             try
             {
-                _cartService.AddToCart(bookId, cartSessionId);
+                _cartService.AddToCart(bookId, userId);
                 return Ok(new { Message = "Book added to cart successfully." });
             }
             catch (Exception ex)
@@ -31,18 +30,18 @@ namespace BookStoreApp.WebAPI.Controllers
             }
         }
 
-        [HttpGet("sessionId")]
-        public IActionResult GetCartSessionId()
-        {
-            string cartSessionId = HttpContext.Session.GetString("CartSessionId") ?? Guid.NewGuid().ToString();
-            HttpContext.Session.SetString("CartSessionId", cartSessionId);
-            return Ok(new { CartSessionId = cartSessionId });
-        }
+        //[HttpGet("sessionId")]
+        //public IActionResult GetCartSessionId()
+        //{
+        //    string cartSessionId = HttpContext.Session.GetString("CartSessionId") ?? Guid.NewGuid().ToString();
+        //    HttpContext.Session.SetString("CartSessionId", cartSessionId);
+        //    return Ok(new { CartSessionId = cartSessionId });
+        //}
 
         [HttpGet("items")]
-        public IActionResult GetCartDetails(string sessionId)
+        public IActionResult GetCartDetails(int userId)
         {
-            var cartItems = _cartService.GetCartItemsForSession(sessionId);
+            var cartItems = _cartService.GetCartItemsForUser(userId);
             return Ok(cartItems);
         }
 
@@ -56,9 +55,9 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpGet("GetTotalPrice")]
-        public IActionResult GetTotalPrice(string sessionId)
+        public IActionResult GetTotalPrice(int userId)
         {
-            var totalPrice = _cartService.GetTotalPrice(sessionId);
+            var totalPrice = _cartService.GetTotalPrice(userId);
             return Ok(totalPrice);
         }
     }

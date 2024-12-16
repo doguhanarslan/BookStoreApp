@@ -21,19 +21,20 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             _context = context;
         }
 
-        public CartItem? GetCartItem(int bookId, string cartSessionId)
+        public CartItem? GetCartItem(int bookId, int userId)
         {
             return _context.CartItems
-                .FirstOrDefault(ci => ci.BookId == bookId && ci.CartSessionId == cartSessionId);
+                .FirstOrDefault(ci => ci.BookId == bookId && ci.UserId == userId);
         }
 
-        public List<CartItemDetails> GetCartItemsForSession(string cartSessionId)
+
+        public List<CartItemDetails> GetCartItemsForUserId(int userId)
         {
             return (from ci in _context.CartItems
                     join b in _context.Books on ci.BookId equals b.Id
                     join ba in _context.BookAuthors on b.Id equals ba.BookId
                     join a in _context.Authors on ba.AuthorId equals a.Id
-                    where ci.CartSessionId == cartSessionId
+                    where ci.UserId == userId
                     select new CartItemDetails
                     {
                         Id = ci.Id,

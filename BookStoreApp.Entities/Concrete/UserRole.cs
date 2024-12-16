@@ -7,16 +7,12 @@ using BookStoreApp.Core.Entities;
 
 namespace BookStoreApp.Entities.Concrete
 {
-    public class CartItem:IEntity
+    public class UserRole:IEntity
     {
         public int Id { get; set; }
-        public int BookId { get; set; }
-        public int Quantity { get; set; }
-        //public string CartSessionId { get; set; }
-
+        
         public int UserId { get; set; }
+        public int RoleId { get; set; }
 
-        public double Price { get; set; }
-        public virtual Book Book { get; set; }
     }
 }

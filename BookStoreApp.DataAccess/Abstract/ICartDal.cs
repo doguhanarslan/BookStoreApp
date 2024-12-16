@@ -11,7 +11,8 @@ namespace BookStoreApp.DataAccess.Abstract
 {
     public interface ICartDal:IEntityRepository<CartItem>
     {
-        public CartItem? GetCartItem(int bookId, string cartSessionId);
-        public List<CartItemDetails> GetCartItemsForSession(string cartSessionId);
+        public CartItem? GetCartItem(int bookId, int userId);
+        //public List<CartItemDetails> GetCartItemsForSession(string cartSessionId);
+        public List<CartItemDetails> GetCartItemsForUserId(int userId);
     }
 }

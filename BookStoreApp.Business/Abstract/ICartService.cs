@@ -10,11 +10,13 @@ namespace BookStoreApp.Business.Abstract
 {
     public interface ICartService
     {
-        public void AddToCart(int bookId, string cartSessionId);
+        public void AddToCart(int bookId, int userId);
         CartItem UpdateQuantity(CartItem cartItem);
         CartItem GetBookCartById(int cartId);
         List<CartItemDetails> GetCartItemsForSession(string sessionId);
-        decimal GetTotalPrice(string cartSessionId);
+
+        List<CartItemDetails> GetCartItemsForUser(int userId);
+        decimal GetTotalPrice(int userId);
         void RemoveFromCart(int bookId);
     }
 }
