@@ -23,7 +23,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 
         public DbSet<Cart> Carts { get; set; }
 
-        public DbSet<CartItem?> CartItems { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }

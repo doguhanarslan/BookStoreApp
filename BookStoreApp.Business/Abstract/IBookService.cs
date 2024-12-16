@@ -10,7 +10,7 @@ namespace BookStoreApp.Business.Abstract
 {
     public interface IBookService
     {
-        List<Book> GetAllBooks();
+        List<BookDetails> GetAllBooks();
 
         Book Add(Book book);
 

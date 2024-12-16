@@ -18,9 +18,9 @@ namespace BookStoreApp.Business.Concrete.Managers
             _bookDal = bookDal;
         }
 
-        public List<Book> GetAllBooks()
+        public List<BookDetails> GetAllBooks()
         {
-            return _bookDal.GetAll();
+            return _bookDal.GetAllBooks();
         }
 
         public Book Add(Book book)
@@ -38,7 +38,7 @@ namespace BookStoreApp.Business.Concrete.Managers
             throw new NotImplementedException();
         }
 
-        public Book? GetBookById(int id)
+        public Book GetBookById(int id)
         {
             return _bookDal.Get(b => b.Id == id);
         }
