@@ -18,21 +18,24 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             _context = context;
         }
 
-        public List<User> GetUser()
+        public User? GetUser(string userName,string password)
         {
             var result = from u in _context.Users
                          join ur in _context.UserRoles on u.Id equals ur.UserId
                          join r in _context.Roles on ur.RoleId equals r.Id
+                         where u.UserName == userName
+                            && u.Password == password
                          select new User
                          {
                              Id = u.Id,
                              FirstName = u.FirstName,
                              LastName = u.LastName,
                              Email = u.Email,
+                             UserName = u.UserName,
                              Password = u.Password,
                              ProfileImage = u.ProfileImage,
                          };
-            return result.ToList();
+            return result.SingleOrDefault();
         }
 
         public User? GetById(int id)
@@ -47,6 +50,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                              FirstName = u.FirstName,
                              LastName = u.LastName,
                              Email = u.Email,
+                             UserName = u.UserName,
                              Password = u.Password,
                              ProfileImage = u.ProfileImage,
                          };

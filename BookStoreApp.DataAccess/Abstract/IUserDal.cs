@@ -11,5 +11,7 @@ namespace BookStoreApp.DataAccess.Abstract
     public interface IUserDal: IEntityRepository<User>
     {
         User? GetById(int id);
+
+        User? GetUser(string userName,string password);
     }
 }

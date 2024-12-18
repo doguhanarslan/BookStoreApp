@@ -9,6 +9,6 @@ namespace BookStoreApp.Business.Abstract
 {
     public interface IUserService
     {
-        User GetUser();
+        User? GetUser(string userName,string password);
     }
 }

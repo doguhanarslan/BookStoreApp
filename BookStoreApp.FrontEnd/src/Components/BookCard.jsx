@@ -1,15 +1,14 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { IoMdCart } from "react-icons/io";
-function BookCard({ book }) {
-  const [cartItem, setCartItem] = useState([]);
+function BookCard({book,user}) {
+  
 
   const addToCart = async () => {
     try {
       await axios
-        .post(`https://localhost:7118/api/Carts/add?bookId=${book.bookId}`)
+        .post(`https://localhost:7118/api/Carts/add?bookId=${book.bookId}&userId=${user.id}`)
         .then((response) => {
-          setCartItem(response.data);
           console.log(response.data);
         });
     } catch (error) {

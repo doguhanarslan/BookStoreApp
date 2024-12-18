@@ -23,9 +23,9 @@ namespace BookStoreApp.Business.Concrete.Managers
             return _userDal.Get(u => u.Id == Id);
         }
 
-        public User GetUser()
+        public User? GetUser(string userName, string password)
         {
-            throw new NotImplementedException();
+            return _userDal.GetUser(userName,password);
         }
     }
 }
