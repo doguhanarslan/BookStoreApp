@@ -10,5 +10,6 @@ namespace BookStoreApp.Business.Abstract
     public interface IUserService
     {
         User? GetUser(string userName,string password);
+        User? GetUserFromCache(string userName, string password);
     }
 }

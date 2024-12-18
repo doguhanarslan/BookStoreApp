@@ -1,4 +1,5 @@
 ﻿using BookStoreApp.Business.Abstract;
+using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,12 @@ namespace BookStoreApp.WebAPI.Controllers
     public class CartsController : ControllerBase
     {
         private readonly ICartService _cartService;
+        private ICacheService _cacheService;
 
-        public CartsController(ICartService cartService)
+        public CartsController(ICartService cartService, ICacheService cacheService)
         {
             _cartService = cartService;
+            _cacheService = cacheService;
         }
 
         [HttpPost("add")]
@@ -44,6 +47,7 @@ namespace BookStoreApp.WebAPI.Controllers
             var cartItems = _cartService.GetCartItemsForUser(userId);
             return Ok(cartItems);
         }
+
 
 
         [HttpGet("getCartById")]

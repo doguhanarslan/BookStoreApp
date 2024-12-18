@@ -23,9 +23,9 @@ function App() {
   };
 
   const handleLoginClick = async () => {
-    await fetchUser();
+    await userLogin();
   };
-  const fetchUser = async () => {
+  const userLogin = async () => {
     await axios
       .get(
         `https://localhost:7118/api/Users?userName=${userNameInput}&password=${passwordInput}`
@@ -38,6 +38,19 @@ function App() {
         console.log(error);
       });
   };
+
+  const fetchUser = async ()=>{
+    try {
+      await axios
+        .get(`https://localhost:7118/api/Users/${user.id}`)
+        .then((response) => {
+          setUser(response.data);
+          console.log(response.data);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+  }
   
   
 
