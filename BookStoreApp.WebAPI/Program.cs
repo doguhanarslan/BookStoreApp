@@ -1,4 +1,4 @@
-using BookStoreApp.Business.Abstract;
+﻿using BookStoreApp.Business.Abstract;
 using BookStoreApp.Business.Concrete.Managers;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis;
@@ -19,22 +19,18 @@ builder.Services.AddScoped<IUserDal, EfUserDal>();
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<DbContext, BookstoreContext>();
 builder.Services.AddSingleton<ICacheService, RedisCacheManager>();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowAllOrigins", builder =>
     {
-        policy.AllowAnyOrigin()
+        builder.WithOrigins("http://localhost:56852", "http://localhost:56853")  // Frontend URLs
+            .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowCredentials(); // Allow cookies and authentication information
     });
 });
-
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+builder.Services.AddControllers();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddDbContext<BookstoreContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -44,7 +40,6 @@ var redisConnectionString = builder.Configuration.GetConnectionString("RedisConn
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 
 builder.Services.AddHttpClient();
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -57,12 +52,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseSession();
+app.UseHttpsRedirection();
+
 app.UseRouting();
 
-app.UseCors("AllowAll");
-
-app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigins"); // Enable CORS policy
 
 app.UseAuthorization();
 

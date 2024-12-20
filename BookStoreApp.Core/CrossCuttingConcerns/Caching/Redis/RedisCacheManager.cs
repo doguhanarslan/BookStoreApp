@@ -41,6 +41,18 @@ namespace BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis
             return JsonSerializer.Deserialize<T>(result);
         }
 
+        public async Task SetUserAsync(string username, string userData)
+        {
+            var key = $"user_{username}";
+            await _cache.StringSetAsync(key, userData, ExpireTime);
+        }
+
+        public async Task<string?> GetUserAsync(string username)
+        {
+            var key = $"user_{username}";
+            return await _cache.StringGetAsync(key);
+        }
+
         public T GetOrAdd<T>(string key, Func<T> action) where T : class
         {
             var result = _cache.StringGet(key);
@@ -51,18 +63,18 @@ namespace BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis
             }
             return JsonSerializer.Deserialize<T>(result);
         }
-        public T GetOrAddUser<T>(string username, string password, Func<T> action) where T : class
-        {
-            var stringQuery = $"{username}:{password}";
-            var result = _cache.StringGet(stringQuery);
-            if (result.IsNull)
-            {
-                result = JsonSerializer.SerializeToUtf8Bytes(action());
-                _cache.StringSet(stringQuery, result, ExpireTime);
-            }
+        //public T GetOrAddUser<T>(string username, string password, Func<T> action) where T : class
+        //{
+        //    var stringQuery = $"user_{username}:{password}";
+        //    var result = _cache.StringGet(stringQuery);
+        //    if (result.IsNull)
+        //    {
+        //        result = JsonSerializer.SerializeToUtf8Bytes(action());
+        //        _cache.StringSet(stringQuery, result, ExpireTime);
+        //    }
 
-            return JsonSerializer.Deserialize<T>(result);
-        }
+        //    return JsonSerializer.Deserialize<T>(result);
+        //}
 
         public async Task Clear(string key)
         {

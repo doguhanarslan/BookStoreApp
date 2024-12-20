@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using BookStoreApp.Business.Abstract;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
@@ -33,18 +34,22 @@ namespace BookStoreApp.Business.Concrete.Managers
 
         public void AddToCart(int bookId, int userId)
         {
-            var existingCartItem = GetCartItem(bookId, userId);
+            var existingCartItem = _cartDal.GetCartItem(bookId, userId);
             var book = _bookDal.GetBookById(bookId);
             if (existingCartItem != null)
             {
-                
                 existingCartItem.Quantity += 1;
-                existingCartItem.Price += book.Price; 
+                existingCartItem.Price += book.Price;
+
+                // Update the existing cart item in the database
                 _cartDal.Update(existingCartItem);
+
+                // Update the cache with the modified cart items
+                var cartItems = _cartDal.GetCartItemsForUserId(userId);
+                _cacheService.SetValueAsync($"cart_items_{userId}", JsonSerializer.Serialize(cartItems));
             }
             else
             {
-                
                 var cartItem = new CartItem
                 {
                     UserId = userId,
@@ -53,7 +58,12 @@ namespace BookStoreApp.Business.Concrete.Managers
                     Price = book.Price
                 };
 
+                // Add the new cart item to the database
                 _cartDal.Add(cartItem);
+
+                // Update the cache with the new cart items
+                var cartItems = _cartDal.GetCartItemsForUserId(userId);
+                _cacheService.SetValueAsync($"cart_items_{userId}", JsonSerializer.Serialize(cartItems));
             }
         }
 

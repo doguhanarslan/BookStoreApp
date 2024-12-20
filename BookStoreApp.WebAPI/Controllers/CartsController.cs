@@ -10,12 +10,14 @@ namespace BookStoreApp.WebAPI.Controllers
     public class CartsController : ControllerBase
     {
         private readonly ICartService _cartService;
+        private IUserService _userService;
         private ICacheService _cacheService;
 
-        public CartsController(ICartService cartService, ICacheService cacheService)
+        public CartsController(ICartService cartService, ICacheService cacheService, IUserService userService)
         {
             _cartService = cartService;
             _cacheService = cacheService;
+            _userService = userService;
         }
 
         [HttpPost("add")]

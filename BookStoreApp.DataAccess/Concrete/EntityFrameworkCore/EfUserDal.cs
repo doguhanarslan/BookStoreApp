@@ -38,6 +38,25 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             return result.SingleOrDefault();
         }
 
+        public User? GetUserByUserName(string userName)
+        {
+            var result = from u in _context.Users
+                         join ur in _context.UserRoles on u.Id equals ur.UserId
+                         join r in _context.Roles on ur.RoleId equals r.Id
+                         where u.UserName == userName
+                         select new User
+                         {
+                             Id = u.Id,
+                             FirstName = u.FirstName,
+                             LastName = u.LastName,
+                             Email = u.Email,
+                             UserName = u.UserName,
+                             Password = u.Password,
+                             ProfileImage = u.ProfileImage,
+                         };
+            return result.SingleOrDefault();
+        }
+
         public User? GetById(int id)
         {
             var result = from u in _context.Users

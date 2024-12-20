@@ -13,5 +13,7 @@ namespace BookStoreApp.DataAccess.Abstract
         User? GetById(int id);
 
         User? GetUser(string userName,string password);
+
+        User? GetUserByUserName(string userName);
     }
 }

@@ -2,6 +2,7 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using BookStoreApp.Business.Abstract;
+using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.Entities.ComplexTypes;
 using BookStoreApp.Entities.Concrete;
@@ -16,11 +17,14 @@ namespace BookStoreApp.WebAPI.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private ICacheService _cacheService;
+        private readonly IUserService _userService;
 
-        public BooksController(IBookService bookService)
+        public BooksController(IBookService bookService, ICacheService cacheService, IUserService userService)
         {
             _bookService = bookService;
-            
+            _cacheService = cacheService;
+            _userService = userService;
         }
 
         [HttpGet]
