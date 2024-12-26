@@ -48,6 +48,17 @@ namespace BookStoreApp.WebAPI.Controllers
             return Ok(books);
         }
 
+        [HttpGet("getBookById/{id}")]
+        public async Task<IActionResult> GetBookById(int id)
+        {
+            var book = _bookService.GetBookById(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return Ok(book);
+        }
+
         [HttpPut]
         public Book AddToCart(Book book)
         {

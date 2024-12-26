@@ -1,32 +1,18 @@
-import React from 'react'
-import BookCard from '../components/BookCard';
-import {useEffect,useState} from 'react';
-import axios from 'axios';
+import React, { useContext } from 'react'
 import CartItem from '../components/CartItem';
-function Cart({user}) {
+import { StoreContext } from '../context/StoreContext';
+function Cart() {
 
-  const [cartItems, setCartItems] = useState([]);
-  const fetchCartItems = async () => {
-    try {
-      await axios
-        .get(`https://localhost:7118/api/Carts/items?userId=${user.id}`)
-        .then((response) => {
-          setCartItems(response.data);
-          console.log(response.data);
-        });
-    } catch (error) {
-        console.log(error);
-    }
-  }
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
-
+  const {user,cartItems,setCartItems} = useContext(StoreContext);
+  
   return (
-    <div>
-      {cartItems.map((cartItem, index) => {
+    <div className='flex flex-row gap-10'>
+      {user ? cartItems.map((cartItem, index) => {
         return <CartItem key={index} cartItem={cartItem} />;
-      })}
+      }): <div>
+        <h1>Lütfen giriş yapın.</h1>
+        </div>}
+      
     </div>
   )
 }

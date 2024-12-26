@@ -33,5 +33,12 @@ namespace BookStoreApp.WebAPI.Controllers
             await _cacheService.Clear(key);
             return Ok();
         }
+
+        [HttpDelete("clearAll")]
+        public IActionResult ClearCache()
+        {
+            _cacheService.ClearAll();
+            return Ok();
+        }
     }
 }

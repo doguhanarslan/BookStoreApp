@@ -32,14 +32,14 @@ namespace BookStoreApp.Business.Concrete.Managers
             return _cartDal.GetCartItem(bookId, userId);
         }
 
-        public void AddToCart(int bookId, int userId)
+        public void AddToCart(int bookId, int userId,int quantity)
         {
             var existingCartItem = _cartDal.GetCartItem(bookId, userId);
             var book = _bookDal.GetBookById(bookId);
             if (existingCartItem != null)
             {
-                existingCartItem.Quantity += 1;
-                existingCartItem.Price += book.Price;
+                existingCartItem.Quantity += quantity;
+                existingCartItem.Price += (book.Price * quantity);
 
                 // Update the existing cart item in the database
                 _cartDal.Update(existingCartItem);
@@ -54,7 +54,7 @@ namespace BookStoreApp.Business.Concrete.Managers
                 {
                     UserId = userId,
                     BookId = book.Id,
-                    Quantity = 1,
+                    Quantity = quantity,
                     Price = book.Price
                 };
 
@@ -99,9 +99,18 @@ namespace BookStoreApp.Business.Concrete.Managers
             return Convert.ToDecimal(totalPrice);
         }
 
-        public void RemoveFromCart(int bookId)
+        public void RemoveFromCart(int bookId, int userId)
         {
-            throw new NotImplementedException();
+            var cartItem = _cartDal.GetCartItem(bookId, userId);
+            if (cartItem != null)
+            {
+                // Remove the cart item from the database
+                _cartDal.Delete(cartItem);
+
+                // Update the cache with the modified cart items
+                var cartItems = _cartDal.GetCartItemsForUserId(userId);
+                _cacheService.SetValueAsync($"cart_items_{userId}", JsonSerializer.Serialize(cartItems));
+            }
         }
     }
 }

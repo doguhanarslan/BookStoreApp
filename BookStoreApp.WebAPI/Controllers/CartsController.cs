@@ -21,12 +21,12 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddToCart(int bookId,int userId)
+        public IActionResult AddToCart(int bookId,int userId,int quantity)
         {
             
             try
             {
-                _cartService.AddToCart(bookId, userId);
+                _cartService.AddToCart(bookId, userId,quantity);
                 return Ok(new { Message = "Book added to cart successfully." });
             }
             catch (Exception ex)
@@ -50,7 +50,11 @@ namespace BookStoreApp.WebAPI.Controllers
             return Ok(cartItems);
         }
 
-
+        [HttpDelete("removeFromCart")]
+        public void DeleteCart(int bookId,int userId)
+        {
+            _cartService.RemoveFromCart(bookId, userId);
+        }
 
         [HttpGet("getCartById")]
         public IActionResult GetBookCartById(int cartId)
