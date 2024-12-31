@@ -19,6 +19,8 @@ builder.Services.AddScoped<IUserDal, EfUserDal>();
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<DbContext, BookstoreContext>();
 builder.Services.AddSingleton<ICacheService, RedisCacheManager>();
+builder.Services.AddScoped<IReviewDal,EfReviewDal>();
+builder.Services.AddScoped<IReviewService, ReviewManager>();
 
 builder.Services.AddCors(options =>
 {

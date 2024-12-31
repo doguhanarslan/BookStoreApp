@@ -22,6 +22,7 @@ namespace BookStoreApp.Entities.Concrete
         public double Price { get; set; }
 
         public ICollection<BookAuthor> BookAuthors { get; set; }
+        public ICollection<BookReview> BookReviews { get; set; }
 
     }
 }

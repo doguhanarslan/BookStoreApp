@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using BookStoreApp.Business.Abstract;
 using BookStoreApp.Core.Aspects.Postsharp.CacheAspects;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
@@ -43,14 +44,25 @@ namespace BookStoreApp.Business.Concrete.Managers
             return _bookDal.Update(book);
         }
 
-        public Book GetBookByName(string name)
+        public BookDetails GetBookByName(string name)
         {
-            throw new NotImplementedException();
+            string n = FormatBookTitle(name);
+            return _bookDal.GetBookByName(n);
         }
 
-        public Book GetBookById(int id)
+        public BookDetails GetBookById(int id)
         {
-            return _bookDal.Get(b => b.Id == id);
+            return _bookDal.GetBookById(id);
+        }
+
+        public string FormatBookTitle(string bookTitle)
+        {
+            var normalizedBookTitle = bookTitle
+                .Replace("ç", "c").Replace("ğ", "g").Replace("ı", "i")
+                .Replace("ö", "o").Replace("ş", "s").Replace("ü", "u")
+                .ToLower()
+                .Replace(" ", "-");
+            return normalizedBookTitle;
         }
 
         public void DeleteBookById()

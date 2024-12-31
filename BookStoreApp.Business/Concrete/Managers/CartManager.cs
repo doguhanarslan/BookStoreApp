@@ -39,7 +39,7 @@ namespace BookStoreApp.Business.Concrete.Managers
             if (existingCartItem != null)
             {
                 existingCartItem.Quantity += quantity;
-                existingCartItem.Price += (book.Price * quantity);
+                existingCartItem.Price += (book.BookPrice * quantity);
 
                 // Update the existing cart item in the database
                 _cartDal.Update(existingCartItem);
@@ -53,9 +53,9 @@ namespace BookStoreApp.Business.Concrete.Managers
                 var cartItem = new CartItem
                 {
                     UserId = userId,
-                    BookId = book.Id,
+                    BookId = book.BookId,
                     Quantity = quantity,
-                    Price = book.Price
+                    Price = book.BookPrice
                 };
 
                 // Add the new cart item to the database

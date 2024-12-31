@@ -5,6 +5,7 @@ import Cart from "./pages/Cart";
 import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { StoreProvider } from "./context/StoreContext";
+import Book from "./pages/Book";
 function App() {
 
 
@@ -20,6 +21,7 @@ function App() {
             path="/cart"
             element={<Cart  />}
           />
+          <Route path="/book/:bookTitle" element={<Book/>}/>
         </Routes>
       </BrowserRouter>
     </StoreProvider>

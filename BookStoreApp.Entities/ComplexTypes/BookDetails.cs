@@ -9,7 +9,6 @@ namespace BookStoreApp.Entities.ComplexTypes
     public class BookDetails
     {
         public int BookId { get; set; }
-        public int AuthorId { get; set; }
         public string BookTitle { get; set; }
 
         public string BookImage { get; set; }
@@ -17,6 +16,11 @@ namespace BookStoreApp.Entities.ComplexTypes
         public string AuthorName { get; set; }
 
         public double BookPrice { get; set; }
+
+        public string ReviewText { get; set; }
+        public decimal BookRate { get; set; }
+
+        public int ReviewCount { get; set; }
 
     }
 }

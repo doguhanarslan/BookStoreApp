@@ -16,8 +16,8 @@ namespace BookStoreApp.Business.Abstract
 
         Book Update(Book book);
 
-        Book GetBookByName(string name);
-        Book? GetBookById(int bookId);
+        BookDetails GetBookByName(string name);
+        BookDetails GetBookById(int bookId);
         void DeleteBookById();
     }
 }

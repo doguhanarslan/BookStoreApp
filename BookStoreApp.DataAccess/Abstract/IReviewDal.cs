@@ -4,18 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BookStoreApp.Core.DataAccess;
-using BookStoreApp.Entities.ComplexTypes;
 using BookStoreApp.Entities.Concrete;
 
 namespace BookStoreApp.DataAccess.Abstract
 {
-    public interface IBookDal:IEntityRepository<Book>
+    public interface IReviewDal:IEntityRepository<BookReview>
     {
-        List<BookDetails> GetAllBooks();
-
-        BookDetails GetBookById(int bookId);
-
-        BookDetails GetBookByName(string name);
-
+        List<BookReview> GetReviewsByBookId(int bookId);
+        BookReview AddReview(int bookId, int userId, string reviewText, int rating);
     }
 }
