@@ -23,6 +23,7 @@ function BookCard({ book }) {
         `https://localhost:7118/api/Carts/add?bookId=${book.bookId}&userId=${user.id}&quantity=${quantity}`
       );
       setCartItems([...cartItems, response.data]);
+      console.log(book);
       setIsInCart(true); // Butonun metnini güncelle
       const notificationId = uuidv4();
       setNotifications((prevNotifications) => [
@@ -104,7 +105,7 @@ function BookCard({ book }) {
           <div className="flex items-center mt-2">
             {renderStars(book.bookRate)}
             <span className="ml-2 text-gray-800 text-sm">({book.bookRate})</span>
-            <span className="ml-2 text-gray-800 text-sm">({book.reviewCount} reviews)</span>
+            <span className="ml-2 text-gray-800 text-sm">({book.bookReviews.length} reviews)</span>
           </div>
         </div>
         <div className="flex items-center mt-4">

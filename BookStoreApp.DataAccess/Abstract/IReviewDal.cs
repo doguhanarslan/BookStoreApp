@@ -11,6 +11,6 @@ namespace BookStoreApp.DataAccess.Abstract
     public interface IReviewDal:IEntityRepository<BookReview>
     {
         List<BookReview> GetReviewsByBookId(int bookId);
-        BookReview AddReview(int bookId, int userId, string reviewText, int rating);
+        BookReview AddReview(int bookId,int userId, string userName, string reviewText, int rating);
     }
 }

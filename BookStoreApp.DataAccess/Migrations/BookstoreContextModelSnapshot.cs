@@ -104,7 +104,7 @@ namespace BookStoreApp.DataAccess.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("BookAuthors");
+                    b.ToTable("BookAuthors", (string)null);
                 });
 
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.BookRank", b =>
@@ -154,8 +154,12 @@ namespace BookStoreApp.DataAccess.Migrations
                         .HasColumnName("ReviewText");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("UserId");
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("UserName");
 
                     b.HasKey("Id");
 

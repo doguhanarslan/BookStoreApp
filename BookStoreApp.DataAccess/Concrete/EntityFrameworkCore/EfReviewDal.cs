@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BookStoreApp.Core.DataAccess.EntityFrameworkCore;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.Entities.Concrete;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 {
@@ -35,36 +36,42 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             throw new NotImplementedException();
         }
 
-        public BookReview AddReview(int bookId, int userId, string reviewText, int rating)
+        public BookReview AddReview(int bookId, int userId, string userName, string reviewText, int rating)
         {
-            try
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
             {
-                var newReview = new BookReview
-                {
-                    BookId = bookId,
-                    UserId = userId,
-                    ReviewText = reviewText,
-                    Rating = rating,
-                    ReviewDate = DateTime.UtcNow
-                };
-
-                _context.BookReviews.Add(newReview);
-                _context.SaveChanges();
-
-                return newReview;
+                throw new ArgumentException("User not found");
             }
-            catch (Exception ex)
+
+            var existingReview = _context.BookReviews.FirstOrDefault(r => r.BookId == bookId && r.UserId == userId);
+            if (existingReview != null)
             {
-                // Log the exception (use your preferred logging framework)
-                Console.WriteLine($"Error adding review: {ex.Message}");
-                throw;
+                throw new InvalidOperationException("User has already reviewed this book");
             }
+
+            var review = new BookReview
+            {
+                BookId = bookId,
+                UserId = userId,
+                UserName = userName,
+                ReviewText = reviewText,
+                Rating = rating,
+                ReviewDate = DateTime.UtcNow
+            };
+
+            _context.BookReviews.Add(review);
+            _context.SaveChanges();
+
+            return review;
         }
+
 
         public List<BookReview> GetReviewsByBookId(int bookId)
         {
             return _context.BookReviews
                 .Where(review => review.BookId == bookId)
+                .Include(review => review.User) // Eagerly load the User entities
                 .ToList();
         }
     } 

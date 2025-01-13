@@ -10,7 +10,7 @@ namespace BookStoreApp.Business.Abstract
 {
     public interface IReviewService
     {
-        BookReview AddReview(int bookId, int userId, string reviewText, int rating);
+        List<BookReview> AddReview(int bookId,int userId, string userName, string reviewText, int rating);
         List<ReviewModel> GetReviewsByBookId(int bookId);
     }
 }

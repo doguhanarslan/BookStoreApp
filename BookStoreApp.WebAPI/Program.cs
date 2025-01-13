@@ -1,7 +1,7 @@
 ﻿using BookStoreApp.Business.Abstract;
 using BookStoreApp.Business.Concrete.Managers;
-using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis;
+using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.DataAccess.Concrete.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +19,7 @@ builder.Services.AddScoped<IUserDal, EfUserDal>();
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<DbContext, BookstoreContext>();
 builder.Services.AddSingleton<ICacheService, RedisCacheManager>();
-builder.Services.AddScoped<IReviewDal,EfReviewDal>();
+builder.Services.AddScoped<IReviewDal, EfReviewDal>();
 builder.Services.AddScoped<IReviewService, ReviewManager>();
 
 builder.Services.AddCors(options =>
@@ -45,6 +45,13 @@ builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure cookie policy
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -59,6 +66,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseCors("AllowAllOrigins"); // Enable CORS policy
+
+app.UseCookiePolicy(); // Apply the cookie policy
 
 app.UseAuthorization();
 

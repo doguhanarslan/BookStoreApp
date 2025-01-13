@@ -1,4 +1,5 @@
 ﻿using BookStoreApp.Business.Abstract;
+using BookStoreApp.Business.DTOs;
 using BookStoreApp.Entities.Concrete;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,11 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpPost("/addReview")]
-        public IActionResult AddReview(int bookId, int userId, string reviewText, int rating)
+        public IActionResult AddReview([FromBody] AddReviewDto dto)
         {
             try
             {
-                _reviewService.AddReview(bookId, userId, reviewText, rating);
+                _reviewService.AddReview(dto.BookId,dto.UserId,dto.UserName, dto.ReviewText, dto.Rating);
                 return Ok(new { Message = "Review added." });
             }
             catch (Exception ex)

@@ -58,8 +58,10 @@ namespace BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis
             var result = _cache.StringGet(key);
             if (result.IsNull)
             {
-                result = JsonSerializer.SerializeToUtf8Bytes(action());
-                _cache.StringSet(key, result, ExpireTime);
+                var value = action();
+                var serializedValue = JsonSerializer.Serialize(value);
+                _cache.StringSet(key, serializedValue, ExpireTime);
+                return value;
             }
             return JsonSerializer.Deserialize<T>(result);
         }

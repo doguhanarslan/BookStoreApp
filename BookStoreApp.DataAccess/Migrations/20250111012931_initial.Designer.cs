@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStoreApp.DataAccess.Migrations
 {
     [DbContext(typeof(BookstoreContext))]
-    [Migration("20241228102054_rating")]
-    partial class rating
+    [Migration("20250111012931_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,43 +114,55 @@ namespace BookStoreApp.DataAccess.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("Id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BookId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("BookId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("BookRanks");
+                    b.ToTable("BookRanks", "public");
                 });
 
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.BookReview", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("Id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BookId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("BookId");
 
                     b.Property<int>("Rating")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("Rating");
 
                     b.Property<DateTime>("ReviewDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ReviewDate");
 
                     b.Property<string>("ReviewText")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("ReviewText");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("UserName");
 
                     b.HasKey("Id");
 
@@ -158,7 +170,7 @@ namespace BookStoreApp.DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BookReviews");
+                    b.ToTable("BookReviews", "public");
                 });
 
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.Cart", b =>
