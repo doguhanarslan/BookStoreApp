@@ -9,6 +9,7 @@ const BookDetails = ({ book }) => {
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(0);
   const [error, setError] = useState("");
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   if (!book) {
     return <div>Book not found</div>;
@@ -78,6 +79,11 @@ const BookDetails = ({ book }) => {
     }
     return stars;
   };
+
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <div className="flex flex-col md:flex-row">
@@ -85,23 +91,28 @@ const BookDetails = ({ book }) => {
           className="w-full md:w-1/3 object-cover rounded-lg"
           src={book.bookImage}
           alt={book.bookTitle}
-          style={{ maxHeight: "400px" }} // Görselin tam görünmesi için maxHeight ayarı
+          style={{ maxHeight: '400px' }} // Görselin tam görünmesi için maxHeight ayarı
         />
-        <div className="md:ml-6 mt-4 md:mt-0">
+        <div className="md:ml-6 mt-4 md:mt-0 flex items-center flex-col">
           <h1 className="text-3xl font-bold text-gray-800">{book.bookTitle}</h1>
-          <p className="text-gray-600 mt-2">{book.bookDescription}</p>
+          <div className="text-gray-600 mt-2">
+            {showFullDescription ? book.bookDescription : `${book.bookDescription.substring(0, 150)}...`}
+            <button onClick={toggleDescription} className="text-blue-500 ml-2">
+              {showFullDescription ? "Show Less" : "Read More"}
+            </button>
+          </div>
           <p className="text-gray-800 mt-4">
             <span className="font-semibold">Author:</span> {book.authorName}
           </p>
           <p className="text-gray-800 mt-2">
             <span className="font-semibold">Price:</span> ${book.bookPrice}
           </p>
-          <p className="text-gray-800 mt-2">
-            <div className="flex flex-row items-center justify-between">
+          <div className="text-gray-800 mt-2">
+            <div className="flex flex-row items-center gap-1">
               <span className="font-semibold">Rating:</span> {book.bookRate}{" "}
               {renderStars(book.bookRate)} ({book.bookReviews.length} reviews)
             </div>
-          </p>
+          </div>
         </div>
       </div>
       <div className="mt-6">
@@ -112,7 +123,7 @@ const BookDetails = ({ book }) => {
               <p className="font-semibold text-gray-800">{review.userName}</p>
               <p className="text-gray-600">{review.reviewText}</p>
               <p className="text-gray-600 flex flex-row items-center gap-1">
-                Rating: {review.rating} {renderStars(book.bookRate)}
+                Rating: {review.rating} {renderStars(review.rating)}
               </p>
               <p className="text-gray-600">
                 Date: {new Date(review.reviewDate).toLocaleDateString()}
@@ -127,10 +138,7 @@ const BookDetails = ({ book }) => {
           <form onSubmit={handleReviewSubmit} className="mt-4">
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="rating"
-              >
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="rating">
                 Rating
               </label>
               <select
@@ -148,10 +156,7 @@ const BookDetails = ({ book }) => {
               </select>
             </div>
             <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="review"
-              >
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="review">
                 Review
               </label>
               <textarea

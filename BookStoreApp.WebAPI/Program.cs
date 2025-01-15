@@ -6,6 +6,8 @@ using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.DataAccess.Concrete.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,13 @@ builder.Services.AddScoped<DbContext, BookstoreContext>();
 builder.Services.AddSingleton<ICacheService, RedisCacheManager>();
 builder.Services.AddScoped<IReviewDal, EfReviewDal>();
 builder.Services.AddScoped<IReviewService, ReviewManager>();
+
+
+ElasticsearchClientSettings settings = new(new Uri("https://localhost:9200"));
+settings.DefaultIndex("books");
+ElasticsearchClient client = new(settings);
+client.IndexAsync("books").GetAwaiter().GetResult();    //index oluşturma
+
 
 builder.Services.AddCors(options =>
 {
@@ -60,6 +69,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 

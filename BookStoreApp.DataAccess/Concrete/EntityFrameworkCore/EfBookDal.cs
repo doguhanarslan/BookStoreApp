@@ -27,9 +27,9 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                          join a in _context.Authors on ba.AuthorId equals a.Id
                          join br in _context.BookReviews on b.Id equals br.BookId into brGroup
                          from br in brGroup.DefaultIfEmpty()
-                         join u in _context.Users on br.UserName equals u.UserName into uGroup
+                         join u in _context.Users on br.UserId equals u.Id into uGroup
                          from u in uGroup.DefaultIfEmpty()
-                         group new { b, a, br, u } by new { b.Id, a.FirstName, a.LastName, b.Title, b.Description, b.BookImage, b.Price } into g
+                         group new { b, a, br, u } by new { b.Id, b.Title, b.Description, b.BookImage, b.Price, a.FirstName, a.LastName } into g
                          select new
                          {
                              Book = g.Key,
@@ -52,7 +52,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                 BookDescription = x.Book.Description,
                 AuthorName = x.AuthorName,
                 BookImage = x.Book.BookImage,
-                BookPrice = Convert.ToDouble(x.Book.Price),
+                BookPrice = x.Book.Price,
                 BookRate = x.Reviews.Any(r => r.Rating.HasValue) ? (decimal)x.Reviews.Where(r => r.Rating.HasValue).Average(r => r.Rating.Value) : 0,
                 BookReviews = x.Reviews.Where(r => r.Rating.HasValue).Select(r => new BookReview
                 {
@@ -67,6 +67,8 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 
             return bookDetailsList;
         }
+
+
 
 
 

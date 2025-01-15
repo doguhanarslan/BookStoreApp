@@ -18,7 +18,6 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore.Mappings
 
 
             builder.Property(b => b.Id).HasColumnName("BookId");
-            builder.Property(b => b.PublisherId).HasColumnName("PublisherId");
             builder.Property(b => b.Title).HasColumnName("Title");
             builder.Property(b => b.Price).HasColumnName("Price");
             builder.Property(b => b.Page).HasColumnName("Page");

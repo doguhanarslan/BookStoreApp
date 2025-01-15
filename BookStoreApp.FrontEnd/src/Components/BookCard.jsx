@@ -12,7 +12,12 @@ function BookCard({ book }) {
   const [notifications, setNotifications] = useState([]);
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
-
+  const truncateDescription = (description, maxLength) => {
+    if (description.length <= maxLength) {
+      return description;
+    }
+    return description.substring(0, maxLength) + '...';
+  };
   useEffect(() => {
     setIsInCart(cartItems.some((item) => item.bookId === book.bookId));
   }, [cartItems, book.bookId]);
@@ -95,7 +100,7 @@ function BookCard({ book }) {
       <div className="p-4 flex flex-col justify-between w-2/3">
         <div>
           <h2 className="text-xl font-bold text-gray-800">{book.bookTitle}</h2>
-          <p className="text-gray-600 mt-2 text-sm">{book.bookDescription}</p>
+          <p className="text-gray-600 mt-2 text-sm">{truncateDescription(book.bookDescription, 300)}</p>
           <p className="text-gray-800 mt-2 text-sm">
             <span className="font-semibold">Author:</span> {book.authorName}
           </p>
@@ -125,6 +130,20 @@ function BookCard({ book }) {
             +
           </button>
         </div>
+
+  <div className="p-4 flex flex-col justify-between w-2/3">
+    {/* Diğer kodlar */}
+    <div className="absolute top-0 left-0 w-full z-50">
+      {notifications.map((notification) => (
+        <div
+          key={notification.id}
+          className="bg-green-500 text-white text-center py-2 px-4 rounded shadow-md mb-2 animate-fade-in"
+        >
+          {notification.message}
+        </div>
+      ))}
+    </div>
+    </div>
         <div className="flex items-center justify-between mt-4">
           <button
             onClick={addToCart}
@@ -139,14 +158,8 @@ function BookCard({ book }) {
           >
             İncele
           </button>
+          
         </div>
-      </div>
-      <div className="fixed top-20 right-4 space-y-4 z-50">
-        {notifications.map((notification) => (
-          <div key={notification.id} className="bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg animate-bounce">
-            {notification.message}
-          </div>
-        ))}
       </div>
     </div>
   );

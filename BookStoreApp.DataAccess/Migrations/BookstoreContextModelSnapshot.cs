@@ -65,8 +65,9 @@ namespace BookStoreApp.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("Description");
 
-                    b.Property<int>("Isbn")
-                        .HasColumnType("integer")
+                    b.Property<string>("Isbn")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("Isbn");
 
                     b.Property<int>("Page")
@@ -76,11 +77,6 @@ namespace BookStoreApp.DataAccess.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double precision")
                         .HasColumnName("Price");
-
-                    b.Property<string>("PublisherId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("PublisherId");
 
                     b.Property<string>("Title")
                         .IsRequired()

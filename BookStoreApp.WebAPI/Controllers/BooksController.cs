@@ -1,14 +1,7 @@
-﻿using System.Net.Http.Headers;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.Json;
+﻿using System.Threading.Tasks;
 using BookStoreApp.Business.Abstract;
-using BookStoreApp.Core.CrossCuttingConcerns.Caching;
-using BookStoreApp.DataAccess.Abstract;
-using BookStoreApp.Entities.ComplexTypes;
 using BookStoreApp.Entities.Concrete;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
 
 namespace BookStoreApp.WebAPI.Controllers
 {
@@ -17,14 +10,12 @@ namespace BookStoreApp.WebAPI.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        private ICacheService _cacheService;
-        private readonly IUserService _userService;
+        
 
-        public BooksController(IBookService bookService, ICacheService cacheService, IUserService userService)
+        public BooksController(IBookService bookService)
         {
             _bookService = bookService;
-            _cacheService = cacheService;
-            _userService = userService;
+            
         }
 
         [HttpGet]

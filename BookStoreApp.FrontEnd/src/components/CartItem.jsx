@@ -49,11 +49,7 @@ function CartItem({ cartItem }) {
         <div className="font-bold text-xl mb-2">{cartItem.bookTitle}</div>
         <p className="text-gray-700 text-base">{cartItem.bookAuthor}</p>
       </div>
-      <div className="flex text-wrap items-center justify-center max-w-[400px] text-center mb-4">
-        <p className="text-black font-serif text-wrap">
-          {cartItem.bookDescription}
-        </p>
-      </div>
+      
       <div className="flex justify-between items-center text-center font-bold bg-white text-black rounded-lg">
         <p>Quantity: {cartItem.quantity}</p>
         <div>

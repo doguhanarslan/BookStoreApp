@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStoreApp.DataAccess.Migrations
 {
     [DbContext(typeof(BookstoreContext))]
-    [Migration("20250111012931_initial")]
-    partial class initial
+    [Migration("20250114014545_aa")]
+    partial class aa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,8 +68,9 @@ namespace BookStoreApp.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("Description");
 
-                    b.Property<int>("Isbn")
-                        .HasColumnType("integer")
+                    b.Property<string>("Isbn")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("Isbn");
 
                     b.Property<int>("Page")
@@ -79,11 +80,6 @@ namespace BookStoreApp.DataAccess.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double precision")
                         .HasColumnName("Price");
-
-                    b.Property<string>("PublisherId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("PublisherId");
 
                     b.Property<string>("Title")
                         .IsRequired()

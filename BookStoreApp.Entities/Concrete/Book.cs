@@ -15,8 +15,7 @@ namespace BookStoreApp.Entities.Concrete
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string PublisherId { get; set; }
-        public int Isbn { get; set; }
+        public string Isbn { get; set; }
         public string BookImage { get; set; }
         public int Page { get; set; }
         public double Price { get; set; }
