@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BookStoreApp.Entities.Concrete;
+using BookStoreApp.Entities.DTOs;
 
 namespace BookStoreApp.Entities.ComplexTypes
 {
@@ -15,12 +16,10 @@ namespace BookStoreApp.Entities.ComplexTypes
         public string BookImage { get; set; }
         public string BookDescription { get; set; }
         public string AuthorName { get; set; }
-
-        public int ReviewCount { get; set; }
         public double BookPrice { get; set; }
-        public decimal BookRate { get; set; }
+        public double BookRate { get; set; }
 
-        public List<BookReview> BookReviews { get; set; }
+        public List<BookReviewDto> BookReviews { get; set; }
 
     }
 }

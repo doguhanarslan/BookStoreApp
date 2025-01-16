@@ -10,12 +10,12 @@ namespace BookStoreApp.WebAPI.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        
+        private readonly IElasticsearchService _elasticsearchService;
 
-        public BooksController(IBookService bookService)
+        public BooksController(IBookService bookService, IElasticsearchService elasticsearchService)
         {
             _bookService = bookService;
-            
+            _elasticsearchService = elasticsearchService;
         }
 
         [HttpGet]
@@ -47,6 +47,13 @@ namespace BookStoreApp.WebAPI.Controllers
         public Book AddToCart(Book book)
         {
             return _bookService.Add(book);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchBooks(string query)
+        {
+            var books = await _elasticsearchService.SearchBooksAsync(query);
+            return Ok(books);
         }
     }
 }

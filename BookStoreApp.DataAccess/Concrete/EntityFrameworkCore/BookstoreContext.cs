@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BookStoreApp.DataAccess.Concrete.EntityFrameworkCore.Mappings;
 using BookStoreApp.Entities.Concrete;
+using BookStoreApp.Entities.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore

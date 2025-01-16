@@ -9,6 +9,8 @@ using BookStoreApp.Core.DataAccess.EntityFrameworkCore;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.Entities.ComplexTypes;
 using BookStoreApp.Entities.Concrete;
+using BookStoreApp.Entities.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 {
@@ -22,51 +24,47 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 
         public List<BookDetails> GetAllBooks()
         {
-            var result = from b in _context.Books
-                         join ba in _context.BookAuthors on b.Id equals ba.BookId
-                         join a in _context.Authors on ba.AuthorId equals a.Id
-                         join br in _context.BookReviews on b.Id equals br.BookId into brGroup
+            var result = from b in _context.Books.AsNoTracking()
+                         join ba in _context.BookAuthors.AsNoTracking() on b.Id equals ba.BookId
+                         join a in _context.Authors.AsNoTracking() on ba.AuthorId equals a.Id
+                         join br in _context.BookReviews.AsNoTracking() on b.Id equals br.BookId into brGroup
                          from br in brGroup.DefaultIfEmpty()
-                         join u in _context.Users on br.UserId equals u.Id into uGroup
+                         join u in _context.Users.AsNoTracking() on br.UserId equals u.Id into uGroup
                          from u in uGroup.DefaultIfEmpty()
-                         group new { b, a, br, u } by new { b.Id, b.Title, b.Description, b.BookImage, b.Price, a.FirstName, a.LastName } into g
-                         select new
+                         group new { b, a, br, u } by new
                          {
-                             Book = g.Key,
-                             AuthorName = g.Key.FirstName + " " + g.Key.LastName,
-                             Reviews = g.Select(x => new
+                             b.Id,
+                             b.Title,
+                             b.Description,
+                             b.BookImage,
+                             b.Price,
+                             a.FirstName,
+                             a.LastName
+                         } into g
+                         select new BookDetails
+                         {
+                             BookId = g.Key.Id,
+                             BookTitle = g.Key.Title ?? "No Title",
+                             BookDescription = g.Key.Description ?? "No Description",
+                             AuthorName = $"{g.Key.FirstName} {g.Key.LastName}",
+                             BookImage = g.Key.BookImage ?? "default.png",
+                             BookPrice = g.Key.Price,
+                             BookRate = g.Any(x => x.br != null) ? g.Where(x => x.br != null).Select(x => x.br.Rating).Average() : 0,
+                             BookReviews = g.Where(x => x.br != null).Select(x => new BookReviewDto
                              {
                                  BookId = x.b.Id,
-                                 UserName = x.u != null ? x.u.UserName : null,
-                                 Rating = x.br != null ? x.br.Rating : (int?)null,
-                                 ReviewText = x.br != null ? x.br.ReviewText : null,
-                                 ReviewDate = x.br != null ? x.br.ReviewDate : (DateTime?)null,
-                                 UserId = x.u != null ? x.u.Id : (int?)null
-                             }).ToList(),
+                                 UserName = x.u != null ? x.u.UserName : "Anonymous",
+                                 UserId = x.u != null ? x.u.Id : 0,
+                                 ReviewText = x.br != null ? x.br.ReviewText : "No Review",
+                                 Rating = x.br != null ? x.br.Rating : 0,
+                                 ReviewDate = x.br != null ? x.br.ReviewDate : DateTime.MinValue,
+                             }).ToList()
                          };
 
-            var bookDetailsList = result.ToList().Select(x => new BookDetails
-            {
-                BookId = x.Book.Id,
-                BookTitle = x.Book.Title,
-                BookDescription = x.Book.Description,
-                AuthorName = x.AuthorName,
-                BookImage = x.Book.BookImage,
-                BookPrice = x.Book.Price,
-                BookRate = x.Reviews.Any(r => r.Rating.HasValue) ? (decimal)x.Reviews.Where(r => r.Rating.HasValue).Average(r => r.Rating.Value) : 0,
-                BookReviews = x.Reviews.Where(r => r.Rating.HasValue).Select(r => new BookReview
-                {
-                    BookId = r.BookId,
-                    UserName = r.UserName ?? string.Empty,
-                    Rating = r.Rating ?? 0,
-                    ReviewText = r.ReviewText ?? string.Empty,
-                    ReviewDate = r.ReviewDate ?? DateTime.MinValue,
-                    UserId = r.UserId ?? 0
-                }).ToList()
-            }).ToList();
-
-            return bookDetailsList;
+            return result.ToList();
         }
+
+
 
 
 

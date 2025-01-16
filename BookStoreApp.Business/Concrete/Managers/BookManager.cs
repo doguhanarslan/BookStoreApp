@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStoreApp.Business.Abstract;
+using BookStoreApp.Business.DTOs;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.Entities.ComplexTypes;
@@ -14,18 +15,19 @@ namespace BookStoreApp.Business.Concrete.Managers
     {
         private readonly IBookDal _bookDal;
         private readonly ICacheService _cacheService;
-        
+        private readonly IElasticsearchService _elasticsearchService;
 
-        public BookManager(IBookDal bookDal, ICacheService cacheService)
+        public BookManager(IBookDal bookDal, ICacheService cacheService, IElasticsearchService elasticsearchService)
         {
             _bookDal = bookDal;
             _cacheService = cacheService;
-            
+            _elasticsearchService = elasticsearchService;
         }
 
         public List<BookDetails> GetAllBooks()
         {
             var books = GetAllBooksFromCache();
+            IndexBooksInElasticsearch(books).Wait();
             return books;
         }
 
@@ -46,7 +48,7 @@ namespace BookStoreApp.Business.Concrete.Managers
         {
             var updatedBook = _bookDal.Update(book);
             var bookDetails = _bookDal.GetBookById(updatedBook.Id);
-           
+            
             return updatedBook;
         }
 
@@ -74,6 +76,14 @@ namespace BookStoreApp.Business.Concrete.Managers
         public void DeleteBookById()
         {
             throw new NotImplementedException();
+        }
+
+        private async Task IndexBooksInElasticsearch(List<BookDetails> books)
+        {
+            foreach (var book in books)
+            {
+                await _elasticsearchService.IndexBookAsync(new BookDetails { BookId = book.BookId, BookReviews = book.BookReviews, BookImage = book.BookImage, BookPrice = book.BookPrice, BookRate = book.BookRate, AuthorName = book.AuthorName, BookDescription = book.BookDescription, BookTitle = book.BookTitle });
+            }
         }
     }
 }

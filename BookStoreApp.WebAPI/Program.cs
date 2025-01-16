@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
+using Microsoft.Extensions.Options;
+using BookStoreApp.Core.Utilities.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,12 +26,16 @@ builder.Services.AddSingleton<ICacheService, RedisCacheManager>();
 builder.Services.AddScoped<IReviewDal, EfReviewDal>();
 builder.Services.AddScoped<IReviewService, ReviewManager>();
 
+// Configure Elasticsearch
+var elasticsearchConfig = builder.Configuration.GetSection("Elasticsearch").Get<ElasticsearchConfig>();
+var settings = new ElasticsearchClientSettings(new Uri("https://localhost:9200"))
+    .DefaultIndex("books")
+    .CertificateFingerprint("8dcfee6fbf4e990f6b5026ea0d9dcdca4fe77920a53afc7d03b6ac335e143381")
+    .Authentication(new BasicAuthentication("elastic", "dqNSOZvmnR6ddi7FCwB3"));
 
-ElasticsearchClientSettings settings = new(new Uri("https://localhost:9200"));
-settings.DefaultIndex("books");
-ElasticsearchClient client = new(settings);
-client.IndexAsync("books").GetAwaiter().GetResult();    //index oluşturma
-
+var client = new ElasticsearchClient(settings);
+builder.Services.AddSingleton(client);
+builder.Services.AddSingleton<IElasticsearchService, ElasticSearchManager>();
 
 builder.Services.AddCors(options =>
 {
@@ -69,8 +75,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
 
 app.UseHttpsRedirection();
 
