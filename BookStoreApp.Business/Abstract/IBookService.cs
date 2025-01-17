@@ -16,6 +16,7 @@ namespace BookStoreApp.Business.Abstract
 
         Book Update(Book book);
 
+        List<BookDetails> GetBooksByCategoryId(int categoryId);
         BookDetails GetBookByName(string name);
         BookDetails GetBookById(int bookId);
         void DeleteBookById();

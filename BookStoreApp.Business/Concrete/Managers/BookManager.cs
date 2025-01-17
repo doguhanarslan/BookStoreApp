@@ -39,17 +39,18 @@ namespace BookStoreApp.Business.Concrete.Managers
         public Book Add(Book book)
         {
             var addedBook = _bookDal.Add(book);
-            var bookDetails = _bookDal.GetBookById(addedBook.Id);
-            
             return addedBook;
         }
 
         public Book Update(Book book)
         {
             var updatedBook = _bookDal.Update(book);
-            var bookDetails = _bookDal.GetBookById(updatedBook.Id);
-            
             return updatedBook;
+        }
+
+        public List<BookDetails> GetBooksByCategoryId(int categoryId)
+        {
+            return _cacheService.GetOrAdd($"categories_{categoryId}", () => _bookDal.GetBookByCategory(categoryId));
         }
 
         public BookDetails GetBookByName(string name)
@@ -82,7 +83,7 @@ namespace BookStoreApp.Business.Concrete.Managers
         {
             foreach (var book in books)
             {
-                await _elasticsearchService.IndexBookAsync(new BookDetails { BookId = book.BookId, BookReviews = book.BookReviews, BookImage = book.BookImage, BookPrice = book.BookPrice, BookRate = book.BookRate, AuthorName = book.AuthorName, BookDescription = book.BookDescription, BookTitle = book.BookTitle });
+                await _elasticsearchService.IndexBookAsync(new BookDetails { BookId = book.BookId, CategoryName = book.CategoryName, BookReviews = book.BookReviews, BookImage = book.BookImage, BookPrice = book.BookPrice, BookRate = book.BookRate, AuthorName = book.AuthorName, BookDescription = book.BookDescription, BookTitle = book.BookTitle });
             }
         }
     }

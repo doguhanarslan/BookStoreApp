@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using BookStoreApp.Core.DataAccess.EntityFrameworkCore;
@@ -31,12 +32,8 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             throw new NotImplementedException();
         }
 
-        public void Delete(BookReview entity)
-        {
-            throw new NotImplementedException();
-        }
 
-        public BookReview AddReview(int bookId, int userId, string userName, string reviewText, int rating)
+        public BookReview AddReview(int id, int bookId, int userId, string userName, string reviewText, int rating)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
@@ -52,6 +49,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 
             var review = new BookReview
             {
+                Id = id,
                 BookId = bookId,
                 UserId = userId,
                 UserName = userName,
@@ -73,6 +71,16 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                 .Where(review => review.BookId == bookId)
                 .Include(review => review.User) // Eagerly load the User entities
                 .ToList();
+        }
+        public void DeleteReview(int reviewId)
+        {
+            var existingReview = _context.BookReviews.FirstOrDefault(r => r.Id == reviewId);
+
+            if (existingReview != null)
+            {
+                _context.BookReviews.Remove(existingReview);
+                _context.SaveChanges();
+            }
         }
     } 
 }

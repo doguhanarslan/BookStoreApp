@@ -25,7 +25,7 @@ public class ElasticSearchManager : IElasticsearchService
 
     public async Task IndexBookAsync(BookDetails book)
     {
-        var response = await _elasticClient.IndexAsync(new BookDetails {BookId = book.BookId,BookReviews = book.BookReviews,BookImage = book.BookImage,BookPrice = book.BookPrice,BookRate = book.BookRate,AuthorName = book.AuthorName,BookDescription = book.BookDescription,BookTitle = book.BookTitle}, idx => idx.Index("books").Id(book.BookId.ToString()) );
+        var response = await _elasticClient.IndexAsync(new BookDetails {BookId = book.BookId, CategoryName = book.CategoryName,BookReviews = book.BookReviews,BookImage = book.BookImage,BookPrice = book.BookPrice,BookRate = book.BookRate,AuthorName = book.AuthorName,BookDescription = book.BookDescription,BookTitle = book.BookTitle}, idx => idx.Index("books").Id(book.BookId.ToString()) );
         if (!response.IsValidResponse)
         {
             throw new Exception("Failed to index document");

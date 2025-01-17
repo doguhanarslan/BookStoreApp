@@ -22,8 +22,6 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             
         }
 
-        public DbSet<Cart> Carts { get; set; }
-
         public DbSet<User> Users { get; set; }
 
         public DbSet<UserRole> UserRoles { get; set; }
@@ -35,7 +33,8 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
 
-        public DbSet<BookRank> BookRanks { get; set; }
+        public DbSet<Category> Categories { get; set; }
+
         public DbSet<BookReview> BookReviews { get; set; }
 
         public DbSet<BookAuthor> BookAuthors { get; set; }
@@ -57,8 +56,8 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             modelBuilder.ApplyConfiguration(new RoleMap());
             modelBuilder.ApplyConfiguration(new UserMap());
             modelBuilder.ApplyConfiguration(new UserRoleMap());
-            modelBuilder.ApplyConfiguration(new BookRanksMap());
             modelBuilder.ApplyConfiguration(new BookReviewMap());
+            modelBuilder.ApplyConfiguration(new CategoryMap());
         }
     }
 }

@@ -24,45 +24,41 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 
         public List<BookDetails> GetAllBooks()
         {
-            var result = from b in _context.Books.AsNoTracking()
-                         join ba in _context.BookAuthors.AsNoTracking() on b.Id equals ba.BookId
-                         join a in _context.Authors.AsNoTracking() on ba.AuthorId equals a.Id
-                         join br in _context.BookReviews.AsNoTracking() on b.Id equals br.BookId into brGroup
-                         from br in brGroup.DefaultIfEmpty()
-                         join u in _context.Users.AsNoTracking() on br.UserId equals u.Id into uGroup
-                         from u in uGroup.DefaultIfEmpty()
-                         group new { b, a, br, u } by new
-                         {
-                             b.Id,
-                             b.Title,
-                             b.Description,
-                             b.BookImage,
-                             b.Price,
-                             a.FirstName,
-                             a.LastName
-                         } into g
-                         select new BookDetails
-                         {
-                             BookId = g.Key.Id,
-                             BookTitle = g.Key.Title ?? "No Title",
-                             BookDescription = g.Key.Description ?? "No Description",
-                             AuthorName = $"{g.Key.FirstName} {g.Key.LastName}",
-                             BookImage = g.Key.BookImage ?? "default.png",
-                             BookPrice = g.Key.Price,
-                             BookRate = g.Any(x => x.br != null) ? g.Where(x => x.br != null).Select(x => x.br.Rating).Average() : 0,
-                             BookReviews = g.Where(x => x.br != null).Select(x => new BookReviewDto
-                             {
-                                 BookId = x.b.Id,
-                                 UserName = x.u != null ? x.u.UserName : "Anonymous",
-                                 UserId = x.u != null ? x.u.Id : 0,
-                                 ReviewText = x.br != null ? x.br.ReviewText : "No Review",
-                                 Rating = x.br != null ? x.br.Rating : 0,
-                                 ReviewDate = x.br != null ? x.br.ReviewDate : DateTime.MinValue,
-                             }).ToList()
-                         };
+            var result = _context.Books
+                .AsNoTracking()
+                .Include(b => b.Category)
+                .Include(b => b.BookAuthors)
+                .ThenInclude(ba => ba.Author)
+                .Include(b => b.BookReviews)
+                .ThenInclude(br => br.User)
+                .Select(b => new BookDetails
+                {
+                    BookId = b.Id,
+                    BookTitle = b.Title ?? "No Title",
+                    BookDescription = b.Description ?? "No Description",
+                    AuthorName = string.Join(", ", b.BookAuthors.Select(ba => ba.Author.FirstName + " " + ba.Author.LastName)),
+                    BookImage = b.BookImage ?? "default.png",
+                    BookPrice = b.Price,
+                    BookRate = b.BookReviews.Any() ? b.BookReviews.Average(br => br.Rating) : 0,
+                    CategoryName = b.Category.CategoryName,
+                    BookReviews = b.BookReviews.Select(br => new BookReviewDto
+                    {
+                        BookId = br.BookId,
+                        UserName = br.User != null ? br.User.UserName : "Anonymous",
+                        UserId = br.User != null ? br.User.Id : 0,
+                        ReviewText = br.ReviewText ?? "No Review",
+                        Rating = br.Rating,
+                        ReviewDate = br.ReviewDate
+                    }).ToList()
+                })
+                .ToList();
 
-            return result.ToList();
+            return result;
         }
+
+
+
+
 
 
 
@@ -85,10 +81,50 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
 
         }
 
+        public List<BookDetails> GetBookByCategory(int categoryId)
+        {
+            var result = _context.Books
+                .AsNoTracking()
+                .Where(b => b.CategoryId == categoryId)
+                .Include(b => b.Category)
+                .Include(b => b.BookAuthors)
+                .ThenInclude(ba => ba.Author)
+                .Include(b => b.BookReviews)
+                .ThenInclude(br => br.User)
+                .Select(b => new BookDetails
+                {
+                    BookId = b.Id,
+                    BookTitle = b.Title ?? "No Title",
+                    BookDescription = b.Description ?? "No Description",
+                    AuthorName = string.Join(", ", b.BookAuthors.Select(ba => ba.Author.FirstName + " " + ba.Author.LastName)),
+                    BookImage = b.BookImage ?? "default.png",
+                    BookPrice = b.Price,
+                    BookRate = b.BookReviews.Any() ? b.BookReviews.Average(br => br.Rating) : 0,
+                    CategoryName = b.Category.CategoryName,
+                    BookReviews = b.BookReviews.Select(br => new BookReviewDto
+                    {
+                        BookId = br.BookId,
+                        UserName = br.User != null ? br.User.UserName : "Anonymous",
+                        UserId = br.User != null ? br.User.Id : 0,
+                        ReviewText = br.ReviewText ?? "No Review",
+                        Rating = br.Rating,
+                        ReviewDate = br.ReviewDate
+                    }).ToList()
+                })
+                .ToList();
+
+            return result;
+        }
+
+
+
+
+
+
 
         public BookDetails GetBookByName(string name)
         {
-            
+
             var normalizedBookTitle = NormalizedBookTitle(name);
 
             var book = GetAllBooks().FirstOrDefault(b => NormalizedBookTitle(b.BookTitle) == normalizedBookTitle);

@@ -12,26 +12,29 @@ using BookStoreApp.Entities.Concrete;
 
 namespace BookStoreApp.Business.Concrete.Managers
 {
-    public class ReviewManager:IReviewService
+    public class ReviewManager : IReviewService
     {
-        private IReviewDal _reviewDal;
-        private ICacheService _cacheService;
+        private readonly IReviewDal _reviewDal;
+        private readonly ICacheService _cacheService;
+        private readonly IBookService _bookService;
+        private readonly IElasticsearchService _elasticsearchService;
 
-
-        public ReviewManager(IReviewDal reviewDal, ICacheService cacheService)
+        public ReviewManager(IReviewDal reviewDal, ICacheService cacheService, IBookService bookService, IElasticsearchService elasticsearchService)
         {
             _reviewDal = reviewDal;
             _cacheService = cacheService;
+            _bookService = bookService;
+            _elasticsearchService = elasticsearchService;
         }
 
-        public List<BookReview> AddReview(int bookId, int userId, string userName, string reviewText, int rating)
+        public List<BookReview> AddReview(int id, int bookId, int userId, string userName, string reviewText, int rating)
         {
             if (string.IsNullOrWhiteSpace(reviewText))
             {
                 throw new ArgumentException("The reviewText field is required.", nameof(reviewText));
             }
 
-            var newReview = _reviewDal.AddReview(bookId, userId, userName, reviewText, rating);
+            var newReview = _reviewDal.AddReview(id,bookId, userId, userName, reviewText, rating);
             var cacheKey = $"book_{bookId}_reviews";
 
             // Retrieve existing reviews from cache or create a new list if not present
@@ -44,7 +47,21 @@ namespace BookStoreApp.Business.Concrete.Managers
             var serializedReviews = JsonSerializer.Serialize(cachedReviews);
             _cacheService.SetValueAsync(cacheKey, serializedReviews);
 
+            // Update the book details in cache and Elasticsearch
+            UpdateBookDetails(bookId);
+
             return cachedReviews;
+        }
+
+        public void DeleteReview(int reviewId)
+        {
+            var review = _reviewDal.Get(r => r.Id == reviewId);
+            if (review == null)
+            {
+                throw new ArgumentException("Review not found.", nameof(reviewId));
+            }
+
+            _reviewDal.Delete(review);
         }
 
         public List<ReviewModel> GetReviewsByBookId(int bookId)
@@ -55,6 +72,7 @@ namespace BookStoreApp.Business.Concrete.Managers
                 var reviews = _reviewDal.GetReviewsByBookId(bookId);
                 return reviews.Select(r => new ReviewModel
                 {
+                    Id = r.Id,
                     ReviewText = r.ReviewText,
                     Rating = r.Rating,
                     UserName = r.User.UserName,
@@ -64,5 +82,15 @@ namespace BookStoreApp.Business.Concrete.Managers
 
             return cachedReviews;
         }
+
+        private void UpdateBookDetails(int bookId)
+        {
+            var bookDetails = _bookService.GetBookById(bookId);
+            _cacheService.Clear("all_books");
+            _cacheService.Clear($"categories_{bookDetails.CategoryName}");
+            _cacheService.GetOrAdd("all_books", () => _bookService.GetAllBooks());
+            _elasticsearchService.IndexBookAsync(bookDetails).Wait();
+        }
     }
 }
+

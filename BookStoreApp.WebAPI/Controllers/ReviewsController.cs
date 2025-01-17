@@ -3,6 +3,7 @@ using BookStoreApp.Business.DTOs;
 using BookStoreApp.Entities.Concrete;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PostSharp.Extensibility;
 
 namespace BookStoreApp.WebAPI.Controllers
 {
@@ -22,12 +23,26 @@ namespace BookStoreApp.WebAPI.Controllers
         {
             try
             {
-                _reviewService.AddReview(dto.BookId,dto.UserId,dto.UserName, dto.ReviewText, dto.Rating);
+                _reviewService.AddReview(dto.Id,dto.BookId,dto.UserId,dto.UserName, dto.ReviewText, dto.Rating);
                 return Ok(new { Message = "Review added." });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("/deleteReview")]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            try
+            {
+                _reviewService.DeleteReview(reviewId);
+                return Ok(new { Message = "Review deleted." });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = e.Message });
             }
         }
 

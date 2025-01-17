@@ -36,6 +36,16 @@ namespace BookStoreApp.WebAPI.Controllers
             return Ok(book);
         }
 
+        [HttpGet("GetBooksByCategoryId/{categoryId}")]
+        public IActionResult GetBooksByCategoryId(int categoryId)
+        {
+            var books = _bookService.GetBooksByCategoryId(categoryId);
+            if (books == null || !books.Any())
+                return NotFound("No books found for this category.");
+
+            return Ok(books);
+        } 
+
         [HttpGet("GetBookByName/{title}")]
         public IActionResult GetBookByName(string title)
         {

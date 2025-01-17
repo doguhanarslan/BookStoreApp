@@ -47,7 +47,7 @@ function CartItem({ cartItem }) {
       </div>
       <div className="px-6 py-4 flex items-center justify-center flex-col">
         <div className="font-bold text-xl mb-2">{cartItem.bookTitle}</div>
-        <p className="text-gray-700 text-base">{cartItem.bookAuthor}</p>
+        <p className="text-gray-700 text-base">{cartItem.bookAuthor}{cartItem.categoryName}</p>
       </div>
       
       <div className="flex justify-between items-center text-center font-bold bg-white text-black rounded-lg">

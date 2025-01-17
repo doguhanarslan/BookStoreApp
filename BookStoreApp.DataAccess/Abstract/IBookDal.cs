@@ -15,6 +15,8 @@ namespace BookStoreApp.DataAccess.Abstract
 
         BookDetails GetBookById(int bookId);
 
+        List<BookDetails> GetBookByCategory(int categoryId);
+
         BookDetails GetBookByName(string name);
 
     }

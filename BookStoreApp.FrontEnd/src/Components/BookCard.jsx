@@ -28,7 +28,7 @@ function BookCard({ book }) {
         `https://localhost:7118/api/Carts/add?bookId=${book.bookId}&userId=${user.id}&quantity=${quantity}`
       );
       setCartItems([...cartItems, response.data]);
-      console.log(book);
+      console.log(cartItems);
       setIsInCart(true); // Butonun metnini güncelle
       const notificationId = uuidv4();
       setNotifications((prevNotifications) => [
@@ -117,7 +117,7 @@ function BookCard({ book }) {
           <button
             value="-"
             onClick={handleQuantityClick}
-            className="text-center text-[12px] hover:bg-gray-200 hover:text-black hover:duration-500 items-center justify-center bg-gray-300 text-black px-[8px] rounded-full"
+            className="text-center text-[14px] hover:bg-red-600 hover:text-white hover:duration-500 items-center justify-center bg-red-500 text-white font-bold px-[10px] py-[1px] rounded-full"
           >
             -
           </button>
@@ -125,7 +125,7 @@ function BookCard({ book }) {
           <button
             value="+"
             onClick={handleQuantityClick}
-            className="text-center text-[12px] hover:bg-gray-200 hover:text-black hover:duration-500 items-center justify-center bg-gray-300 text-black px-[8px] rounded-full"
+            className="text-center text-[14px] hover:bg-red-600 hover:text-white hover:duration-500 items-center justify-center bg-red-500 text-white font-bold px-[10px] py-[1px] rounded-full"
           >
             +
           </button>
@@ -147,14 +147,14 @@ function BookCard({ book }) {
         <div className="flex items-center justify-between mt-4">
           <button
             onClick={addToCart}
-            className="flex items-center justify-center bg-black text-white font-bold py-1 px-2 rounded hover:bg-gray-800 transition-colors duration-300 text-sm"
+            className="flex items-center justify-center bg-red-500 text-white font-bold p-2 rounded-2xl hover:bg-red-600 transition-colors duration-300 text-sm"
           >
             {isInCart ? "In Cart" : "Add to Cart"}
             <IoMdCart className="ml-1 text-white text-[14px]" />
           </button>
           <button
             onClick={handleViewBook}
-            className="flex items-center justify-center bg-gray-800 text-white font-bold py-1 px-2 rounded hover:bg-black transition-colors duration-300 text-sm"
+            className="flex items-center justify-center bg-red-500 text-white font-bold p-2 rounded-2xl hover:bg-red-600 transition-colors duration-300 text-sm"
           >
             İncele
           </button>

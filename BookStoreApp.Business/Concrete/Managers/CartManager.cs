@@ -18,21 +18,25 @@ namespace BookStoreApp.Business.Concrete.Managers
         private readonly IBookDal _bookDal;
         private readonly IUserDal _userDal;
         private readonly ICacheService _cacheService;
-        public CartManager(ICartDal cartDal, IBookService bookService, IBookDal bookDal, IUserDal userDal, ICacheService cacheService)
+        private readonly IBookService _bookService;
+        private readonly IElasticsearchService _elasticsearchService;
+
+        public CartManager(ICartDal cartDal, IBookService bookService, IBookDal bookDal, IUserDal userDal, ICacheService cacheService, IElasticsearchService elasticsearchService)
         {
             _cartDal = cartDal;
             _bookDal = bookDal;
             _userDal = userDal;
             _cacheService = cacheService;
+            _bookService = bookService;
+            _elasticsearchService = elasticsearchService;
         }
-
 
         public CartItem? GetCartItem(int bookId, int userId)
         {
             return _cartDal.GetCartItem(bookId, userId);
         }
 
-        public void AddToCart(int bookId, int userId,int quantity)
+        public void AddToCart(int bookId, int userId, int quantity)
         {
             var existingCartItem = _cartDal.GetCartItem(bookId, userId);
             var book = _bookDal.GetBookById(bookId);
@@ -43,10 +47,6 @@ namespace BookStoreApp.Business.Concrete.Managers
 
                 // Update the existing cart item in the database
                 _cartDal.Update(existingCartItem);
-
-                // Update the cache with the modified cart items
-                var cartItems = _cartDal.GetCartItemsForUserId(userId);
-                _cacheService.SetValueAsync($"cart_items_{userId}", JsonSerializer.Serialize(cartItems));
             }
             else
             {
@@ -60,19 +60,17 @@ namespace BookStoreApp.Business.Concrete.Managers
 
                 // Add the new cart item to the database
                 _cartDal.Add(cartItem);
-
-                // Update the cache with the new cart items
-                var cartItems = _cartDal.GetCartItemsForUserId(userId);
-                _cacheService.SetValueAsync($"cart_items_{userId}", JsonSerializer.Serialize(cartItems));
             }
+
+            // Update the cache with the modified cart items
+            UpdateCartCache(userId);
         }
-
-
 
         public List<CartItemDetails> GetCartItemsForUser(int userId)
         {
             return GetCartItemsFromCache(userId);
         }
+
         public List<CartItemDetails> GetCartItemsFromCache(int userId)
         {
             var user = _userDal.GetById(userId);
@@ -82,7 +80,6 @@ namespace BookStoreApp.Business.Concrete.Managers
             }
             return _cacheService.GetOrAdd($"cart_items_{user.Id}", () => _cartDal.GetCartItemsForUserId(user.Id));
         }
-
 
         public CartItem GetBookCartById(int bookId)
         {
@@ -108,9 +105,16 @@ namespace BookStoreApp.Business.Concrete.Managers
                 _cartDal.Delete(cartItem);
 
                 // Update the cache with the modified cart items
-                var cartItems = _cartDal.GetCartItemsForUserId(userId);
-                _cacheService.SetValueAsync($"cart_items_{userId}", JsonSerializer.Serialize(cartItems));
+                UpdateCartCache(userId);
             }
+        }
+
+        private void UpdateCartCache(int userId)
+        {
+            _cacheService.Clear($"cart_items_{userId}");
+            var cartItems = _cartDal.GetCartItemsForUserId(userId);
+            _cacheService.GetOrAdd($"cart_items_{userId}", () => cartItems);
         }
     }
 }
+

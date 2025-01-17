@@ -1,9 +1,27 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
+import axios from 'axios';
 import { StoreContext } from '../context/StoreContext';
 import CartItem from '../components/CartItem';
 
 function Cart() {
-  const { user, cartItems } = useContext(StoreContext);
+  const { user, cartItems, setCartItems } = useContext(StoreContext);
+
+  const fetchCartItems = async (userId) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7118/api/Carts/items?userId=${userId}`
+      );
+      setCartItems(response.data);
+    } catch (error) {
+      console.log("Error fetching cart items:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchCartItems(user.id);
+    }
+  }, [user]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">

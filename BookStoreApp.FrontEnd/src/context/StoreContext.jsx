@@ -8,6 +8,7 @@ export const StoreContext = createContext();
 export const StoreProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [query, setQuery] = useState('');
 
@@ -51,7 +52,7 @@ export const StoreProvider = ({ children }) => {
       const response = await axios.get(
         `https://localhost:7118/api/Carts/items?userId=${userId}`
       );
-      setCartItems(response.data);
+      return response.data;
     } catch (error) {
       console.log("Error fetching cart items:", error);
     }
@@ -104,6 +105,17 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("https://localhost:7118/api/Categories/");
+      console.log(response.data);
+      return setCategories(response.data); // Kategori verilerini döner
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      return [];
+    }
+  };
+
   const fetchBooks = async () => {
     try {
       let response;
@@ -120,15 +132,20 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const initialize = async () => {
-      await fetchUser();
-    };
-    initialize();
-  }, []);
+  const fetchBooksByCategory = async (categoryId) => {
+    try {
+      const response = await axios.get(`https://localhost:7118/api/Books/GetBooksByCategoryId/${categoryId}`);
+      setBooks(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const initialize = async () => {
+      await fetchUser();
+      await fetchCategories();
       await fetchBooks();
     };
     initialize();
@@ -142,9 +159,11 @@ export const StoreProvider = ({ children }) => {
 
   return (
     <StoreContext.Provider
-      value={{ user, setUser, login, logout, books, cartItems, setCartItems, query, setQuery }}
+      value={{ user, setUser, login, logout, books, cartItems, setCartItems, query, setQuery, categories, fetchBooksByCategory }}
     >
       {children}
     </StoreContext.Provider>
   );
 };
+
+export default StoreContext;
