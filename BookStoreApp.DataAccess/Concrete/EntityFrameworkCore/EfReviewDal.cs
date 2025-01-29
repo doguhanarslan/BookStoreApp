@@ -21,18 +21,6 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             _context = context;
         }
 
-        public List<BookReview> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public BookReview Update(BookReview entity)
-        {
-            throw new NotImplementedException();
-        }
-
-
         public BookReview AddReview(int id, int bookId, int userId, string userName, string reviewText, int rating)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
@@ -72,6 +60,15 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                 .Include(review => review.User) // Eagerly load the User entities
                 .ToList();
         }
+
+        public List<BookReview> UpdateReview(int reviewId)
+        {
+            //var selectedReview = _context.BookReviews.FirstOrDefault(review => review.Id == reviewId);
+
+            return new List<BookReview>();
+            //return _context.BookReviews.Update(selectedReview);
+        }
+
         public void DeleteReview(int reviewId)
         {
             var existingReview = _context.BookReviews.FirstOrDefault(r => r.Id == reviewId);

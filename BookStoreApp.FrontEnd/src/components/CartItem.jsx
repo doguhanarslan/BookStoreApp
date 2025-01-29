@@ -1,8 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { StoreContext } from "../context/StoreContext";
 import axios from "axios";
+
 function CartItem({ cartItem }) {
-  const { user,cartItems,setCartItems } = useContext(StoreContext);
+  const { user, cartItems, setCartItems } = useContext(StoreContext);
+
   const removeFromCart = async () => {
     try {
       await axios.delete(
@@ -21,43 +23,31 @@ function CartItem({ cartItem }) {
   };
 
   return (
-    <div className="rounded-xl overflow-hidden p-4 shadow-2xl items-center justify-center">
-      <div className="flex items-center justify-end mb-2">
+    <div className="rounded-xl overflow-hidden p-6 shadow-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-3xl transition-shadow duration-300">
+      <div className="flex justify-end mb-4">
         <button
           onClick={removeFromCart}
-          className="bg-black hover:bg-red-600 p-2 text-white duration-500 font-bold rounded-lg"
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
         >
           Remove Item
         </button>
       </div>
-      <div className="flex items-center justify-center object-contain">
-        {cartItem.bookImage ? (
-          <img
-            className="w-72 object-cover rounded"
-            src={cartItem?.bookImage}
-            alt="poster"
-          />
-        ) : (
-          <img
-            className="w-78 object-cover"
-            src={`https://placehold.co/600x900/png`}
-            alt="poster"
-          />
-        )}
+      <div className="flex justify-center mb-6">
+        <img
+          className="w-48 h-64 object-cover rounded-lg shadow-md"
+          src={cartItem.bookImage || "https://placehold.co/600x900/png"}
+          alt="book cover"
+        />
       </div>
-      <div className="px-6 py-4 flex items-center justify-center flex-col">
-        <div className="font-bold text-xl mb-2">{cartItem.bookTitle}</div>
-        <p className="text-gray-700 text-base">{cartItem.bookAuthor}{cartItem.categoryName}</p>
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">{cartItem.bookTitle}</h2>
+        <p className="text-gray-600 text-lg">{cartItem.bookAuthor} | {cartItem.categoryName}</p>
       </div>
-      
-      <div className="flex justify-between items-center text-center font-bold bg-white text-black rounded-lg">
-        <p>Quantity: {cartItem.quantity}</p>
-        <div>
-          <p className="text-black text-[16px]">
-            Price:{" "}
-            <span className="text-[19px] font-thin">${cartItem.price}</span>{" "}
-          </p>
-        </div>
+      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-inner">
+        <p className="text-gray-700 font-medium">Quantity: {cartItem.quantity}</p>
+        <p className="text-gray-700 font-medium">
+          Price: <span className="text-green-600 font-bold">${cartItem.price}</span>
+        </p>
       </div>
     </div>
   );

@@ -43,6 +43,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                     CategoryName = b.Category.CategoryName,
                     BookReviews = b.BookReviews.Select(br => new BookReviewDto
                     {
+                        Id = br.Id,
                         BookId = br.BookId,
                         UserName = br.User != null ? br.User.UserName : "Anonymous",
                         UserId = br.User != null ? br.User.Id : 0,
@@ -103,6 +104,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                     CategoryName = b.Category.CategoryName,
                     BookReviews = b.BookReviews.Select(br => new BookReviewDto
                     {
+                        Id = br.Id,
                         BookId = br.BookId,
                         UserName = br.User != null ? br.User.UserName : "Anonymous",
                         UserId = br.User != null ? br.User.Id : 0,

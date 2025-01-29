@@ -12,6 +12,7 @@ namespace BookStoreApp.DataAccess.Abstract
     {
         List<BookReview> GetReviewsByBookId(int bookId);
 
+        List<BookReview> UpdateReview(int reviewId);
         public void DeleteReview(int reviewId);
         BookReview AddReview(int id,int bookId,int userId, string userName, string reviewText, int rating);
     }

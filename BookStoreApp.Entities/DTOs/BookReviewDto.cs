@@ -4,6 +4,7 @@ namespace BookStoreApp.Entities.DTOs
 {
     public class BookReviewDto
     {
+        public int Id { get; set; }
         public int BookId { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; }

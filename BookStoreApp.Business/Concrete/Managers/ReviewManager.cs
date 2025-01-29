@@ -9,6 +9,7 @@ using BookStoreApp.Business.DTOs;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.Entities.Concrete;
+using Elastic.Clients.Elasticsearch.MachineLearning;
 
 namespace BookStoreApp.Business.Concrete.Managers
 {
@@ -56,12 +57,20 @@ namespace BookStoreApp.Business.Concrete.Managers
         public void DeleteReview(int reviewId)
         {
             var review = _reviewDal.Get(r => r.Id == reviewId);
+            var key = $"book_{review.BookId}_reviews";
+
             if (review == null)
             {
                 throw new ArgumentException("Review not found.", nameof(reviewId));
             }
 
+            _cacheService.Clear(key);
             _reviewDal.Delete(review);
+        }
+
+        public List<BookReview> UpdateReview(int reviewId)
+        {
+            throw new NotImplementedException();
         }
 
         public List<ReviewModel> GetReviewsByBookId(int bookId)

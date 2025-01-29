@@ -38,6 +38,7 @@ namespace BookStoreApp.WebAPI.Controllers
             try
             {
                 _reviewService.DeleteReview(reviewId);
+
                 return Ok(new { Message = "Review deleted." });
             }
             catch (Exception e)

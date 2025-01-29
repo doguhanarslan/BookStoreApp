@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { StoreContext } from "../context/StoreContext";
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { use } from "react";
 
 const BookDetails = ({ book }) => {
   const { user } = useContext(StoreContext); // Kullanıcı bilgilerini context'ten alın
@@ -15,20 +16,33 @@ const BookDetails = ({ book }) => {
     return <div>Book not found</div>;
   }
 
-  const fetchReviewsByBookId = async () => {
+  const fetchReviewsByBookId = async (bookId) => {
     try {
-      const response = await axios.get(
-        `https://localhost:7118/getReviewsByBookId?bookId=${book.bookId}`
-      );
-      setReviews(response.data);
-      console.log(response.data);
+      
+        const response = await axios.get(
+          `https://localhost:7118/getReviewsByBookId?bookId=${bookId}`
+        );
+        setReviews(response.data);
+        console.log(response.data);
+      
     } catch (error) {
+
       console.error("Error fetching reviews:", error);
     }
   };
-
   useEffect(() => {
-    fetchReviewsByBookId();
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`https://localhost:7118/api/Books/getBookById/${book.bookId}`);
+        response.data.bookReviews.map((review) => {
+            fetchReviewsByBookId(review.bookId);
+            setReviews([...reviews,review]);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
   }, [book]);
 
   const handleReviewSubmit = async (e) => {
@@ -66,6 +80,16 @@ const BookDetails = ({ book }) => {
     }
   };
 
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      await axios.delete(
+        `https://localhost:7118/deleteReview?reviewId=${reviewId}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -91,12 +115,14 @@ const BookDetails = ({ book }) => {
           className="w-full md:w-1/3 object-cover rounded-lg"
           src={book.bookImage}
           alt={book.bookTitle}
-          style={{ maxHeight: '400px' }} // Görselin tam görünmesi için maxHeight ayarı
+          style={{ maxHeight: "400px" }} // Görselin tam görünmesi için maxHeight ayarı
         />
         <div className="md:ml-6 mt-4 md:mt-0 flex items-center flex-col">
           <h1 className="text-3xl font-bold text-gray-800">{book.bookTitle}</h1>
           <div className="text-gray-600 mt-2">
-            {showFullDescription ? book.bookDescription : `${book.bookDescription.substring(0, 150)}...`}
+            {showFullDescription
+              ? book.bookDescription
+              : `${book.bookDescription.substring(0, 150)}...`}
             <button onClick={toggleDescription} className="text-blue-500 ml-2">
               {showFullDescription ? "Show Less" : "Read More"}
             </button>
@@ -120,6 +146,12 @@ const BookDetails = ({ book }) => {
         <ul className="mt-4 space-y-2">
           {reviews.map((review, index) => (
             <li key={index} className="bg-gray-100 p-4 rounded-lg shadow-md">
+              <button
+                className="flex-row justify-end absolute right-72"
+                onClick={() => handleDeleteReview(review.id)}
+              >
+                X
+              </button>
               <p className="font-semibold text-gray-800">{review.userName}</p>
               <p className="text-gray-600">{review.reviewText}</p>
               <p className="text-gray-600 flex flex-row items-center gap-1">
@@ -138,7 +170,10 @@ const BookDetails = ({ book }) => {
           <form onSubmit={handleReviewSubmit} className="mt-4">
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="rating">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="rating"
+              >
                 Rating
               </label>
               <select
@@ -156,7 +191,10 @@ const BookDetails = ({ book }) => {
               </select>
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="review">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="review"
+              >
                 Review
               </label>
               <textarea
