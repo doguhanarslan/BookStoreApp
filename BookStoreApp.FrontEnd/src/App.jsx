@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import { StoreProvider } from "./context/StoreContext";
 import Book from "./pages/Book";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 function App() {
 
 
@@ -22,6 +23,7 @@ function App() {
             path="/cart"
             element={<Cart  />}
           />
+          <Route path="/signup" element={<Signup/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/book/:bookTitle" element={<Book/>}/>
         </Routes>

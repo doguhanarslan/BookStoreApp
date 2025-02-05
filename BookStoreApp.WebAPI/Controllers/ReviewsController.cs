@@ -33,11 +33,11 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpDelete("/deleteReview")]
-        public IActionResult DeleteReview(int reviewId)
+        public IActionResult DeleteReview(int reviewId,int userId)
         {
             try
             {
-                _reviewService.DeleteReview(reviewId);
+                _reviewService.DeleteReview(reviewId,userId);
 
                 return Ok(new { Message = "Review deleted." });
             }

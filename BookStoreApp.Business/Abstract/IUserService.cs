@@ -13,5 +13,6 @@ namespace BookStoreApp.Business.Abstract
         //User? GetUser(string userName,string password);
         //User? GetUserFromCache(string userName, string password);
         Task<User> ValidateUserAsync(string username, string password);
+        Task<User> AddUserAsync(User user);
     }
 }

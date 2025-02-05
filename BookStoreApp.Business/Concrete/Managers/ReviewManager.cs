@@ -6,10 +6,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BookStoreApp.Business.Abstract;
 using BookStoreApp.Business.DTOs;
+using BookStoreApp.Business.ValidationRules.FluentValidation;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.DataAccess.Abstract;
 using BookStoreApp.Entities.Concrete;
 using Elastic.Clients.Elasticsearch.MachineLearning;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace BookStoreApp.Business.Concrete.Managers
 {
@@ -19,13 +22,15 @@ namespace BookStoreApp.Business.Concrete.Managers
         private readonly ICacheService _cacheService;
         private readonly IBookService _bookService;
         private readonly IElasticsearchService _elasticsearchService;
+        private IValidator<BookReview> _validator;
 
-        public ReviewManager(IReviewDal reviewDal, ICacheService cacheService, IBookService bookService, IElasticsearchService elasticsearchService)
+        public ReviewManager(IReviewDal reviewDal, ICacheService cacheService, IBookService bookService, IElasticsearchService elasticsearchService, IValidator<BookReview> validator)
         {
             _reviewDal = reviewDal;
             _cacheService = cacheService;
             _bookService = bookService;
             _elasticsearchService = elasticsearchService;
+            _validator = validator;
         }
 
         public List<BookReview> AddReview(int id, int bookId, int userId, string userName, string reviewText, int rating)
@@ -54,18 +59,28 @@ namespace BookStoreApp.Business.Concrete.Managers
             return cachedReviews;
         }
 
-        public void DeleteReview(int reviewId)
+
+
+        public void DeleteReview(int reviewId, int userId)
         {
             var review = _reviewDal.Get(r => r.Id == reviewId);
-            var key = $"book_{review.BookId}_reviews";
-
             if (review == null)
             {
                 throw new ArgumentException("Review not found.", nameof(reviewId));
             }
 
-            _cacheService.Clear(key);
+            // Check if the user is authorized to delete the review
+            if (review.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to delete this review.");
+            }
+
+            var cacheKey = $"book_{review.BookId}_reviews";
+            _cacheService.Clear(cacheKey);
             _reviewDal.Delete(review);
+
+            // Update the book details in cache and Elasticsearch
+            UpdateBookDetails(review.BookId);
         }
 
         public List<BookReview> UpdateReview(int reviewId)

@@ -14,11 +14,12 @@ namespace BookStoreApp.WebAPI.Controllers
     {
         IUserService _userService;
         ICacheService _cacheService;
-
-        public UsersController(IUserService userService, ICacheService cacheService)
+        private readonly IWebHostEnvironment _environment;
+        public UsersController(IUserService userService, ICacheService cacheService, IWebHostEnvironment environment)
         {
             _userService = userService;
             _cacheService = cacheService;
+            _environment = environment;
         }
 
         [HttpPost("login")]
@@ -42,6 +43,49 @@ namespace BookStoreApp.WebAPI.Controllers
             });
 
             return Ok(new { message = "Login successful" });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromForm] RegisterModel model)
+        {
+            // Profile image handling
+            string profileImagePath = null;
+            if (model.ProfileImage != null && model.ProfileImage.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ProfileImage.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ProfileImage.CopyToAsync(fileStream);
+                }
+
+                profileImagePath = $"/uploads/{uniqueFileName}";
+            }
+
+            var user = new User
+            {
+                UserName = model.UserName,
+                Password = model.Password, // Note: Password should be hashed!
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                ProfileImage = profileImagePath
+            };
+
+            var result = await _userService.AddUserAsync(user);
+            if (result == null)
+            {
+                return BadRequest(new { message = "User already exists" });
+            }
+
+            return Ok(new { message = "User registered successfully" });
         }
 
         [HttpGet("loggedUser")]

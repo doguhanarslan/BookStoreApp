@@ -8,6 +8,7 @@ export const StoreContext = createContext();
 export const StoreProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [books, setBooks] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [categories, setCategories] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [query, setQuery] = useState('');
@@ -144,22 +145,35 @@ export const StoreProvider = ({ children }) => {
 
   useEffect(() => {
     const initialize = async () => {
-      await fetchUser();
-      await fetchCategories();
       await fetchBooks();
     };
     initialize();
   }, [query]);
 
+
+
   useEffect(() => {
     if (user) {
       fetchCartItems(user.id);
     }
-  }, [user]);
+  }, [setCartItems]);
 
+  useEffect(()=>{
+    const initialize = async ()=>{
+      await fetchCategories();
+    }
+    initialize();
+  },[]);
+
+  useEffect(()=>{
+    const initialize = async ()=>{
+      await fetchUser();
+    }
+    initialize();
+  },[]);
   return (
     <StoreContext.Provider
-      value={{ user, setUser, login, logout, books, cartItems, setCartItems, query, setQuery, categories, fetchBooksByCategory }}
+      value={{ user, setUser, login, logout, books, cartItems, setCartItems, query, setQuery, categories, fetchBooksByCategory,reviews,setReviews }}
     >
       {children}
     </StoreContext.Provider>

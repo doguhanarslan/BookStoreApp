@@ -12,7 +12,7 @@ namespace BookStoreApp.Business.Abstract
     {
         List<BookReview> AddReview(int id,int bookId,int userId, string userName, string reviewText, int rating);
 
-        public void DeleteReview(int reviewId);
+        public void DeleteReview(int reviewId,int userId);
 
         List<BookReview> UpdateReview(int reviewId);
 

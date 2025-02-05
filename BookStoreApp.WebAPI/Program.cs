@@ -1,5 +1,6 @@
 ﻿using BookStoreApp.Business.Abstract;
 using BookStoreApp.Business.Concrete.Managers;
+using BookStoreApp.Business.ValidationRules.FluentValidation;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching;
 using BookStoreApp.DataAccess.Abstract;
@@ -10,6 +11,9 @@ using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
 using Microsoft.Extensions.Options;
 using BookStoreApp.Core.Utilities.Config;
+using BookStoreApp.Entities.Concrete;
+using FluentValidation;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +31,8 @@ builder.Services.AddScoped<IReviewDal, EfReviewDal>();
 builder.Services.AddScoped<IReviewService, ReviewManager>();
 builder.Services.AddScoped<ICategoryDal, EfCategoryDal>();
 builder.Services.AddScoped<ICategoryService, CategoryManager>();
+builder.Services.AddScoped<IElasticsearchService, ElasticSearchManager>();
+builder.Services.AddScoped<IValidator<BookReview>, ReviewValidator>();
 
 // Configure Elasticsearch
 var elasticsearchConfig = builder.Configuration.GetSection("Elasticsearch").Get<ElasticsearchConfig>();
@@ -61,7 +67,10 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Conn
 builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10485760;
+});
 // Configure cookie policy
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -79,7 +88,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseCors("AllowAllOrigins"); // Enable CORS policy
@@ -91,3 +100,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

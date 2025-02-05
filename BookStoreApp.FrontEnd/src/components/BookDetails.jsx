@@ -5,8 +5,7 @@ import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { use } from "react";
 
 const BookDetails = ({ book }) => {
-  const { user } = useContext(StoreContext); // Kullanıcı bilgilerini context'ten alın
-  const [reviews, setReviews] = useState([]);
+  const { user,reviews,setReviews } = useContext(StoreContext);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(0);
   const [error, setError] = useState("");
@@ -18,13 +17,11 @@ const BookDetails = ({ book }) => {
 
   const fetchReviewsByBookId = async (bookId) => {
     try {
-      
         const response = await axios.get(
           `https://localhost:7118/getReviewsByBookId?bookId=${bookId}`
         );
         setReviews(response.data);
         console.log(response.data);
-      
     } catch (error) {
 
       console.error("Error fetching reviews:", error);
@@ -80,10 +77,11 @@ const BookDetails = ({ book }) => {
     }
   };
 
-  const handleDeleteReview = async (reviewId) => {
+  const handleDeleteReview = async (reviewId,userId) => {
+    setReviews(reviews.filter((review) => review.id !== reviewId));
     try {
       await axios.delete(
-        `https://localhost:7118/deleteReview?reviewId=${reviewId}`
+        `https://localhost:7118/deleteReview?reviewId=${reviewId}&userId=${userId}`
       );
     } catch (error) {
       console.log(error);
@@ -115,7 +113,7 @@ const BookDetails = ({ book }) => {
           className="w-full md:w-1/3 object-cover rounded-lg"
           src={book.bookImage}
           alt={book.bookTitle}
-          style={{ maxHeight: "400px" }} // Görselin tam görünmesi için maxHeight ayarı
+          style={{ maxHeight: "400px" }} 
         />
         <div className="md:ml-6 mt-4 md:mt-0 flex items-center flex-col">
           <h1 className="text-3xl font-bold text-gray-800">{book.bookTitle}</h1>
@@ -146,12 +144,14 @@ const BookDetails = ({ book }) => {
         <ul className="mt-4 space-y-2">
           {reviews.map((review, index) => (
             <li key={index} className="bg-gray-100 p-4 rounded-lg shadow-md">
+              {user && user.userName === review.userName && (
               <button
                 className="flex-row justify-end absolute right-72"
-                onClick={() => handleDeleteReview(review.id)}
+                onClick={() => handleDeleteReview(review.id,user.id)}
               >
                 X
               </button>
+              )}
               <p className="font-semibold text-gray-800">{review.userName}</p>
               <p className="text-gray-600">{review.reviewText}</p>
               <p className="text-gray-600 flex flex-row items-center gap-1">

@@ -10,7 +10,7 @@ using BookStoreApp.Entities.Concrete;
 
 namespace BookStoreApp.Business.Concrete.Managers
 {
-    public class UserManager: IUserService
+    public class UserManager : IUserService
     {
         private IUserDal _userDal;
         private ICacheService _cacheService;
@@ -45,6 +45,18 @@ namespace BookStoreApp.Business.Concrete.Managers
 
             return user;
         }
+
+        public async Task<User> AddUserAsync(User user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var addedUser = _userDal.AddUser(user);
+
+            if (addedUser == null) throw new InvalidOperationException("User could not be added.");
+
+            return addedUser;
+        }
+
         private string HashPassword(string password)
         {
             // Şifreyi hashleme işlemi (örneğin, SHA256)

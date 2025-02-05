@@ -75,5 +75,36 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                          };
             return result.FirstOrDefault();
         }
+
+        // add user to database
+        public User AddUser(User user)
+        {
+            
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            var userId = user.Id;
+
+            var existingUserRole = _context.UserRoles
+                .FirstOrDefault(ur => ur.UserId == userId && ur.RoleId == 2);
+
+            if (existingUserRole == null)
+            {
+                
+                var userRole = new UserRole
+                {
+                    UserId = userId,
+                    RoleId = 2
+                };
+
+                _context.UserRoles.Add(userRole);
+                _context.SaveChanges();
+            }
+
+            return user;
+        }
+
+
+
     }
 }

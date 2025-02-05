@@ -105,7 +105,7 @@ namespace BookStoreApp.DataAccess.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("BookAuthors");
+                    b.ToTable("BookAuthors", (string)null);
                 });
 
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.BookReview", b =>

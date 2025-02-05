@@ -6,7 +6,7 @@ import { StoreContext } from "../context/StoreContext";
 import logo from "../assets/booklogo.png";
 
 function Header() {
-  const { user, logout, query, setQuery, categories, fetchBooksByCategory } = useContext(StoreContext);
+  const { user, logout, query, setQuery, categories,fetchBooksByCategory } = useContext(StoreContext);
   const navigate = useNavigate();
   const [userNameInput, setUserNameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -21,16 +21,20 @@ function Header() {
 
   const handleCartClick = () => {
     navigate("/cart");
+    window.location.reload();
   };
 
-  const handleHomeClick = () => {navigate("/")
-  };
+  const handleHomeClick = () => navigate("/");
 
   const handleLoginPageClick = () => navigate("/login");
+
+  const handleSignupPageClick = () => navigate("/signup");
 
   const handleCategoryClick = (categoryId) => {
     fetchBooksByCategory(categoryId);
   };
+
+  const profileImageUrl = user ? `https://localhost:7118${user.profileImage}` : '';
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white border-b-red-500 border-2 rounded-bl-3xl rounded-br-3xl text-white p-2 flex justify-between items-center shadow-md z-50">
@@ -72,13 +76,24 @@ function Header() {
               <FaSignOutAlt className="mr-1 text-black text-[14px]" />
               Logout
             </button>
+            <img
+              src={profileImageUrl}
+              alt="Profile"
+              className="h-10 w-10 rounded-full ml-2"
+            />
           </>
         )}
         {!user && (
-          <button onClick={handleLoginPageClick} className="bg-white hover:shadow-2xl hover:border-b-[0.1em] duration-300 hover:border-b-red-600 text-red-500 hover:duration-150 p-2 rounded-lg flex items-center">
-            <FaSignInAlt className="mr-1 text-red-500 text-[16px]" />
-            Login
-          </button>
+          <>
+            <button onClick={handleSignupPageClick} className="bg-white hover:shadow-2xl hover:border-b-[0.1em] duration-300 hover:border-b-red-600 text-red-500 hover:duration-150 p-2 rounded-lg flex items-center">
+              <FaSignInAlt className="mr-1 text-red-500 text-[16px]" />
+              Signup
+            </button>
+            <button onClick={handleLoginPageClick} className="bg-white hover:shadow-2xl hover:border-b-[0.1em] duration-300 hover:border-b-red-600 text-red-500 hover:duration-150 p-2 rounded-lg flex items-center">
+              <FaSignInAlt className="mr-1 text-red-500 text-[16px]" />
+              Login
+            </button>
+          </>
         )}
       </div>
     </header>
