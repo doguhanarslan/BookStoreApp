@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using BookStoreApp.Business.DTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookStoreApp.WebAPI.Controllers
 {
@@ -22,9 +23,16 @@ namespace BookStoreApp.WebAPI.Controllers
             _environment = environment;
         }
 
+        public static User user = new();
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginModel model)
         {
+            var hashedPw = new PasswordHasher<User>().HashPassword(UsersController.user, model.Password);
+
+
+
+
+
             var user = await _userService.ValidateUserAsync(model.Username, model.Password);
             if (user == null)
             {
