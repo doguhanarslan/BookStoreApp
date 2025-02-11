@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStoreApp.DataAccess.Migrations
 {
     [DbContext(typeof(BookstoreContext))]
-    [Migration("20250116230438_categoryMigration")]
-    partial class categoryMigration
+    [Migration("20250211011335_AddRefreshToken")]
+    partial class AddRefreshToken
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -137,8 +137,8 @@ namespace BookStoreApp.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ReviewText");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -195,8 +195,8 @@ namespace BookStoreApp.DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("Quantity");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -245,12 +245,10 @@ namespace BookStoreApp.DataAccess.Migrations
 
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("Id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -267,15 +265,21 @@ namespace BookStoreApp.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("LastName");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("Password");
+                        .HasColumnName("PasswordHash");
 
                     b.Property<string>("ProfileImage")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("ProfileImage");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -288,22 +292,17 @@ namespace BookStoreApp.DataAccess.Migrations
 
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.UserRole", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("Id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("UserId");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("integer")
                         .HasColumnName("RoleId");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("UserId");
+                    b.HasKey("UserId", "RoleId");
 
-                    b.HasKey("Id");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("UserRole", "public");
                 });
@@ -368,6 +367,25 @@ namespace BookStoreApp.DataAccess.Migrations
                     b.Navigation("Book");
                 });
 
+            modelBuilder.Entity("BookStoreApp.Entities.Concrete.UserRole", b =>
+                {
+                    b.HasOne("BookStoreApp.Entities.Concrete.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookStoreApp.Entities.Concrete.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.Author", b =>
                 {
                     b.Navigation("BookAuthors");
@@ -383,6 +401,16 @@ namespace BookStoreApp.DataAccess.Migrations
             modelBuilder.Entity("BookStoreApp.Entities.Concrete.Category", b =>
                 {
                     b.Navigation("Books");
+                });
+
+            modelBuilder.Entity("BookStoreApp.Entities.Concrete.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("BookStoreApp.Entities.Concrete.User", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

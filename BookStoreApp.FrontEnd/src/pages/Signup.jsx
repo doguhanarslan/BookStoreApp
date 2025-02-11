@@ -30,11 +30,11 @@ const Signup = () => {
     formData.append("Email", email);
     formData.append("UserName", userName);
     formData.append("Password", password);
-    formData.append("ProfileImage", selectedFile);
+    formData.append("ProfileImage", "asd");
 
     try {
       const response = await axios.post(
-        `https://localhost:7118/api/Users/register`,
+        `https://localhost:7118/api/Auth/register`,
         formData,
         {
           headers: {

@@ -21,7 +21,7 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddToCart(int bookId,int userId,int quantity)
+        public IActionResult AddToCart(int bookId,Guid userId,int quantity)
         {
             
             try
@@ -44,14 +44,14 @@ namespace BookStoreApp.WebAPI.Controllers
         //}
 
         [HttpGet("items")]
-        public IActionResult GetCartDetails(int userId)
+        public IActionResult GetCartDetails(Guid userId)
         {
             var cartItems = _cartService.GetCartItemsForUser(userId);
             return Ok(cartItems);
         }
 
         [HttpDelete("removeFromCart")]
-        public void DeleteCart(int bookId,int userId)
+        public void DeleteCart(int bookId,Guid userId)
         {
             _cartService.RemoveFromCart(bookId, userId);
         }
@@ -65,7 +65,7 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpGet("GetTotalPrice")]
-        public IActionResult GetTotalPrice(int userId)
+        public IActionResult GetTotalPrice(Guid userId)
         {
             var totalPrice = _cartService.GetTotalPrice(userId);
             return Ok(totalPrice);

@@ -16,27 +16,25 @@ namespace BookStoreApp.Business.Concrete.Managers
     {
         private readonly ICartDal _cartDal;
         private readonly IBookDal _bookDal;
-        private readonly IUserDal _userDal;
         private readonly ICacheService _cacheService;
         private readonly IBookService _bookService;
         private readonly IElasticsearchService _elasticsearchService;
 
-        public CartManager(ICartDal cartDal, IBookService bookService, IBookDal bookDal, IUserDal userDal, ICacheService cacheService, IElasticsearchService elasticsearchService)
+        public CartManager(ICartDal cartDal, IBookService bookService, IBookDal bookDal, ICacheService cacheService, IElasticsearchService elasticsearchService)
         {
             _cartDal = cartDal;
             _bookDal = bookDal;
-            _userDal = userDal;
             _cacheService = cacheService;
             _bookService = bookService;
             _elasticsearchService = elasticsearchService;
         }
 
-        public CartItem? GetCartItem(int bookId, int userId)
+        public CartItem? GetCartItem(int bookId, Guid userId)
         {
             return _cartDal.GetCartItem(bookId, userId);
         }
 
-        public void AddToCart(int bookId, int userId, int quantity)
+        public void AddToCart(int bookId, Guid userId, int quantity)
         {
             var existingCartItem = _cartDal.GetCartItem(bookId, userId);
             var book = _bookDal.GetBookById(bookId);
@@ -66,19 +64,15 @@ namespace BookStoreApp.Business.Concrete.Managers
             UpdateCartCache(userId);
         }
 
-        public List<CartItemDetails> GetCartItemsForUser(int userId)
+        public List<CartItemDetails> GetCartItemsForUser(Guid userId)
         {
             return GetCartItemsFromCache(userId);
         }
 
-        public List<CartItemDetails> GetCartItemsFromCache(int userId)
+        public List<CartItemDetails> GetCartItemsFromCache(Guid userId)
         {
-            var user = _userDal.GetById(userId);
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user), "User not found");
-            }
-            return _cacheService.GetOrAdd($"cart_items_{user.Id}", () => _cartDal.GetCartItemsForUserId(user.Id));
+            
+            return _cacheService.GetOrAdd($"cart_items_{userId}", () => _cartDal.GetCartItemsForUserId(userId));
         }
 
         public CartItem GetBookCartById(int bookId)
@@ -86,7 +80,7 @@ namespace BookStoreApp.Business.Concrete.Managers
             return _cartDal.Get(cart => cart.BookId == bookId);
         }
 
-        public decimal GetTotalPrice(int userId)
+        public decimal GetTotalPrice(Guid userId)
         {
             double totalPrice = 0;
             foreach (var cart in _cartDal.GetCartItemsForUserId(userId))
@@ -96,7 +90,7 @@ namespace BookStoreApp.Business.Concrete.Managers
             return Convert.ToDecimal(totalPrice);
         }
 
-        public void RemoveFromCart(int bookId, int userId)
+        public void RemoveFromCart(int bookId, Guid userId)
         {
             var cartItem = _cartDal.GetCartItem(bookId, userId);
             if (cartItem != null)
@@ -109,7 +103,7 @@ namespace BookStoreApp.Business.Concrete.Managers
             }
         }
 
-        private void UpdateCartCache(int userId)
+        private void UpdateCartCache(Guid userId)
         {
             _cacheService.Clear($"cart_items_{userId}");
             var cartItems = _cartDal.GetCartItemsForUserId(userId);

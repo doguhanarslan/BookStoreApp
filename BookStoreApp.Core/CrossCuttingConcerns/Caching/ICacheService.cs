@@ -16,7 +16,7 @@ namespace BookStoreApp.Core.CrossCuttingConcerns.Caching
 
         public Task<string?> GetUserAsync(string? username);
 
-        //T GetOrAddUser<T>(string username, string password, Func<T> action) where T : class?;
+        T GetOrAddUser<T>(string username, string password, Func<T> action) where T : class?;
         T GetOrAdd<T>(string key, Func<T> action) where T : class;
         Task Clear(string key);
         void ClearAll();

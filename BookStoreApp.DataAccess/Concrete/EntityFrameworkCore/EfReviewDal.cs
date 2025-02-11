@@ -21,7 +21,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             _context = context;
         }
 
-        public BookReview AddReview(int id, int bookId, int userId, string userName, string reviewText, int rating)
+        public BookReview AddReview(int id, int bookId, Guid userId, string userName, string reviewText, int rating)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
@@ -79,7 +79,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                 _context.SaveChanges();
             }
         }
-    } 
+    }
 }
 
 

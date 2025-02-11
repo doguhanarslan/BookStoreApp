@@ -14,11 +14,19 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore.Mappings
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
             builder.ToTable(@"UserRole", @"public");
-            builder.HasKey(u => u.Id);
 
-            builder.Property(u => u.Id).HasColumnName("Id");
+            builder.HasKey(ur => new { ur.UserId, ur.RoleId });
+
             builder.Property(u => u.UserId).HasColumnName("UserId");
             builder.Property(u => u.RoleId).HasColumnName("RoleId");
+
+            builder.HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(ur => ur.UserId);
+
+            builder.HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId);
         }
     }
 }

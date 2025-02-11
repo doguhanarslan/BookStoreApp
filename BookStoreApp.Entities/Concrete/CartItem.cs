@@ -14,7 +14,7 @@ namespace BookStoreApp.Entities.Concrete
         public int Quantity { get; set; }
         //public string CartSessionId { get; set; }
 
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         public double Price { get; set; }
         public virtual Book Book { get; set; }

@@ -14,7 +14,7 @@ namespace BookStoreApp.Business.ValidationRules.FluentValidation
         {
             RuleFor(r => r.UserId).Must(BeCreatedByUser);
         }
-        private bool BeCreatedByUser(BookReview review, int userId)
+        private bool BeCreatedByUser(BookReview review, Guid userId)
         {
             return review.UserId == userId;
         }

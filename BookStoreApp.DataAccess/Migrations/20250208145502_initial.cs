@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStoreApp.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class aa : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,25 +31,6 @@ namespace BookStoreApp.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Book",
-                schema: "public",
-                columns: table => new
-                {
-                    BookId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Isbn = table.Column<string>(type: "text", nullable: false),
-                    BookImage = table.Column<string>(type: "text", nullable: false),
-                    Page = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<double>(type: "double precision", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Book", x => x.BookId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Carts",
                 schema: "public",
                 columns: table => new
@@ -62,6 +43,20 @@ namespace BookStoreApp.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Carts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                schema: "public",
+                columns: table => new
+                {
+                    CategoryId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CategoryName = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,13 +78,12 @@ namespace BookStoreApp.DataAccess.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     UserName = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
                     ProfileImage = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -102,14 +96,40 @@ namespace BookStoreApp.DataAccess.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserRole", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Book",
+                schema: "public",
+                columns: table => new
+                {
+                    BookId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Isbn = table.Column<string>(type: "text", nullable: false),
+                    BookImage = table.Column<string>(type: "text", nullable: false),
+                    Page = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Book", x => x.BookId);
+                    table.ForeignKey(
+                        name: "FK_Book_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalSchema: "public",
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -139,51 +159,6 @@ namespace BookStoreApp.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookRanks",
-                schema: "public",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BookId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookRanks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BookRanks_Book_BookId",
-                        column: x => x.BookId,
-                        principalSchema: "public",
-                        principalTable: "Book",
-                        principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CartItems",
-                schema: "public",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BookId = table.Column<int>(type: "integer", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<double>(type: "double precision", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CartItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CartItems_Book_BookId",
-                        column: x => x.BookId,
-                        principalSchema: "public",
-                        principalTable: "Book",
-                        principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BookReviews",
                 schema: "public",
                 columns: table => new
@@ -192,7 +167,7 @@ namespace BookStoreApp.DataAccess.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     BookId = table.Column<int>(type: "integer", nullable: false),
                     UserName = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReviewText = table.Column<string>(type: "text", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false),
                     ReviewDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -216,16 +191,40 @@ namespace BookStoreApp.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CartItems",
+                schema: "public",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    BookId = table.Column<int>(type: "integer", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Book_BookId",
+                        column: x => x.BookId,
+                        principalSchema: "public",
+                        principalTable: "Book",
+                        principalColumn: "BookId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Book_CategoryId",
+                schema: "public",
+                table: "Book",
+                column: "CategoryId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_BookAuthors_AuthorId",
                 table: "BookAuthors",
                 column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BookRanks_BookId",
-                schema: "public",
-                table: "BookRanks",
-                column: "BookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookReviews_BookId",
@@ -251,10 +250,6 @@ namespace BookStoreApp.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BookAuthors");
-
-            migrationBuilder.DropTable(
-                name: "BookRanks",
-                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "BookReviews",
@@ -286,6 +281,10 @@ namespace BookStoreApp.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Book",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "Categories",
                 schema: "public");
         }
     }

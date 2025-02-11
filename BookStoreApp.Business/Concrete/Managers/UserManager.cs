@@ -21,24 +21,24 @@ namespace BookStoreApp.Business.Concrete.Managers
         }
 
 
-        public User GetById(int id)
+        public User GetById(Guid id)
         {
             return _userDal.Get(u => u.Id == id);
         }
 
-        //public User? GetUser(string userName, string password)
-        //{
-        //    return GetUserFromCache(userName, password);
-        //}
+        public User? GetUser(string userName, string password)
+        {
+            return GetUserFromCache(userName, password);
+        }
 
-        //public User? GetUserFromCache(string userName, string password)
-        //{
-        //    return _cacheService.GetOrAddUser(userName, password,()=>_userDal.GetUser(userName,password));
-        //}
+        public User? GetUserFromCache(string userName, string password)
+        {
+            return _cacheService.GetOrAddUser(userName, password, () => _userDal.GetUser(userName, password));
+        }
         public async Task<User> ValidateUserAsync(string username, string password)
         {
             var user = _userDal.GetUser(username, password);
-            if (user == null || user.Password != password)
+            if (user == null)
             {
                 return null;
             }
@@ -57,14 +57,5 @@ namespace BookStoreApp.Business.Concrete.Managers
             return addedUser;
         }
 
-        private string HashPassword(string password)
-        {
-            // Şifreyi hashleme işlemi (örneğin, SHA256)
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
-        }
     }
 }

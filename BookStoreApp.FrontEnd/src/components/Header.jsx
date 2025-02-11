@@ -13,6 +13,7 @@ function Header() {
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
+    console.log(user);
   };
 
   const handleLogoutClick = () => {

@@ -65,18 +65,18 @@ namespace BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis
             }
             return JsonSerializer.Deserialize<T>(result);
         }
-        //public T GetOrAddUser<T>(string username, string password, Func<T> action) where T : class
-        //{
-        //    var stringQuery = $"user_{username}:{password}";
-        //    var result = _cache.StringGet(stringQuery);
-        //    if (result.IsNull)
-        //    {
-        //        result = JsonSerializer.SerializeToUtf8Bytes(action());
-        //        _cache.StringSet(stringQuery, result, ExpireTime);
-        //    }
+        public T GetOrAddUser<T>(string username, string password, Func<T> action) where T : class
+        {
+            var stringQuery = $"user_{username}:{password}";
+            var result = _cache.StringGet(stringQuery);
+            if (result.IsNull)
+            {
+                result = JsonSerializer.SerializeToUtf8Bytes(action());
+                _cache.StringSet(stringQuery, result, ExpireTime);
+            }
 
-        //    return JsonSerializer.Deserialize<T>(result);
-        //}
+            return JsonSerializer.Deserialize<T>(result);
+        }
 
         public async Task Clear(string key)
         {

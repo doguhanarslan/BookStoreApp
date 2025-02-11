@@ -45,6 +45,7 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
             {
                 optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=BookStoreDb;Username=postgres;Password=postgres");
             }
+
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

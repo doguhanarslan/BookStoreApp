@@ -16,19 +16,20 @@ export const StoreProvider = ({ children }) => {
   // Kullanıcı bilgilerini API'den al
   const fetchUser = async () => {
     try {
+      const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        "https://localhost:7118/api/Users/loggedUser",
+        "https://localhost:7118/api/Auth/getUser",
         {
-          withCredentials: true,
           headers: {
             accept: "*/*",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (response.status === 200) {
-        setUser(response.data.user);
-        console.log("Fetched user:", response.data.user);
+        setUser(response.data);
+        console.log("Fetched user:", response.data);
       } else {
         setUser(null);
         console.log("No user logged in");
@@ -48,10 +49,38 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  // Kullanıcı giriş fonksiyonu
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post(
+        "https://localhost:7118/api/Auth/login",
+        { username, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Login successful:", response.data);
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('userId', response.data.userId);
+      fetchUser();
+    } catch (error) {
+      console.error("Login failed:", error.response?.data || error.message);
+    }
+  };
+
   const fetchCartItems = async (userId) => {
     try {
+      const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        `https://localhost:7118/api/Carts/items?userId=${userId}`
+        `https://localhost:7118/api/Carts/items?userId=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       return response.data;
     } catch (error) {
@@ -59,38 +88,19 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
-  // Kullanıcı giriş fonksiyonu
-  const login = async (username, password) => {
-    try {
-      const response = await axios.post(
-        "https://localhost:7118/api/Users/login",
-        { username, password },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Login successful:", response.data);
-      setUser(response.data.user);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      window.location.reload();
-    } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
-    }
-  };
-
   // Kullanıcı çıkış fonksiyonu
-  const logout = async (username) => {
+  const logout = async () => {
     try {
+      const token = localStorage.getItem('accessToken');
+      const refreshToken = user.refreshToken;
+      const userId = user.id;
       const response = await axios.post(
-        "https://localhost:7118/api/Users/logout",
-        { username },
+        "https://localhost:7118/api/Auth/logout",
+        { userId, refreshToken },
         {
-          withCredentials: true,
           headers: {
             accept: "*/*",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -102,7 +112,7 @@ export const StoreProvider = ({ children }) => {
         window.location.reload();
       }
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout failed:", error.response?.data || error.message);
     }
   };
 
@@ -150,30 +160,29 @@ export const StoreProvider = ({ children }) => {
     initialize();
   }, [query]);
 
-
-
   useEffect(() => {
     if (user) {
       fetchCartItems(user.id);
     }
   }, [setCartItems]);
 
-  useEffect(()=>{
-    const initialize = async ()=>{
+  useEffect(() => {
+    const initialize = async () => {
       await fetchCategories();
-    }
+    };
     initialize();
-  },[]);
+  }, []);
 
-  useEffect(()=>{
-    const initialize = async ()=>{
+  useEffect(() => {
+    const initialize = async () => {
       await fetchUser();
-    }
+    };
     initialize();
-  },[]);
+  }, []);
+
   return (
     <StoreContext.Provider
-      value={{ user, setUser, login, logout, books, cartItems, setCartItems, query, setQuery, categories, fetchBooksByCategory,reviews,setReviews }}
+      value={{ user, setUser, login, logout, books, cartItems, setCartItems, query, setQuery, categories, fetchBooksByCategory, reviews, setReviews }}
     >
       {children}
     </StoreContext.Provider>

@@ -33,14 +33,14 @@ namespace BookStoreApp.Business.Concrete.Managers
             _validator = validator;
         }
 
-        public List<BookReview> AddReview(int id, int bookId, int userId, string userName, string reviewText, int rating)
+        public List<BookReview> AddReview(int id, int bookId, Guid userId, string userName, string reviewText, int rating)
         {
             if (string.IsNullOrWhiteSpace(reviewText))
             {
                 throw new ArgumentException("The reviewText field is required.", nameof(reviewText));
             }
 
-            var newReview = _reviewDal.AddReview(id,bookId, userId, userName, reviewText, rating);
+            var newReview = _reviewDal.AddReview(id, bookId, userId, userName, reviewText, rating);
             var cacheKey = $"book_{bookId}_reviews";
 
             // Retrieve existing reviews from cache or create a new list if not present
@@ -61,7 +61,7 @@ namespace BookStoreApp.Business.Concrete.Managers
 
 
 
-        public void DeleteReview(int reviewId, int userId)
+        public void DeleteReview(int reviewId, Guid userId)
         {
             var review = _reviewDal.Get(r => r.Id == reviewId);
             if (review == null)

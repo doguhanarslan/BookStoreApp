@@ -46,7 +46,6 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                         Id = br.Id,
                         BookId = br.BookId,
                         UserName = br.User != null ? br.User.UserName : "Anonymous",
-                        UserId = br.User != null ? br.User.Id : 0,
                         ReviewText = br.ReviewText ?? "No Review",
                         Rating = br.Rating,
                         ReviewDate = br.ReviewDate
@@ -107,7 +106,6 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore
                         Id = br.Id,
                         BookId = br.BookId,
                         UserName = br.User != null ? br.User.UserName : "Anonymous",
-                        UserId = br.User != null ? br.User.Id : 0,
                         ReviewText = br.ReviewText ?? "No Review",
                         Rating = br.Rating,
                         ReviewDate = br.ReviewDate

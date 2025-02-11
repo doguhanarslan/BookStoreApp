@@ -33,7 +33,7 @@ namespace BookStoreApp.WebAPI.Controllers
         }
 
         [HttpDelete("/deleteReview")]
-        public IActionResult DeleteReview(int reviewId,int userId)
+        public IActionResult DeleteReview(int reviewId,Guid userId)
         {
             try
             {

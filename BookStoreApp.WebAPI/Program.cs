@@ -1,4 +1,5 @@
-﻿using BookStoreApp.Business.Abstract;
+﻿using System.Text;
+using BookStoreApp.Business.Abstract;
 using BookStoreApp.Business.Concrete.Managers;
 using BookStoreApp.Business.ValidationRules.FluentValidation;
 using BookStoreApp.Core.CrossCuttingConcerns.Caching.Redis;
@@ -12,8 +13,14 @@ using Elastic.Transport;
 using Microsoft.Extensions.Options;
 using BookStoreApp.Core.Utilities.Config;
 using BookStoreApp.Entities.Concrete;
+using BookStoreApp.WebAPI.Services;
+using Scalar.AspNetCore;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.Features;
+using PostSharp.Extensibility;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,10 +36,14 @@ builder.Services.AddScoped<DbContext, BookstoreContext>();
 builder.Services.AddSingleton<ICacheService, RedisCacheManager>();
 builder.Services.AddScoped<IReviewDal, EfReviewDal>();
 builder.Services.AddScoped<IReviewService, ReviewManager>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryDal, EfCategoryDal>();
 builder.Services.AddScoped<ICategoryService, CategoryManager>();
 builder.Services.AddScoped<IElasticsearchService, ElasticSearchManager>();
 builder.Services.AddScoped<IValidator<BookReview>, ReviewValidator>();
+
+// Register IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 // Configure Elasticsearch
 var elasticsearchConfig = builder.Configuration.GetSection("Elasticsearch").Get<ElasticsearchConfig>();
@@ -44,7 +55,11 @@ var settings = new ElasticsearchClientSettings(new Uri("https://localhost:9200")
 var client = new ElasticsearchClient(settings);
 builder.Services.AddSingleton(client);
 builder.Services.AddSingleton<IElasticsearchService, ElasticSearchManager>();
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", builder =>
@@ -60,6 +75,22 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddDbContext<BookstoreContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+        ValidAudience = builder.Configuration["AppSettings:Audience"],
+        IssuerSigningKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
+        //ClockSkew = TimeSpan.Zero // Remove delay of token when expire
+    };
+});
+builder.Services.AddAuthorization();
 // Configure Redis
 var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost";
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
@@ -95,9 +126,11 @@ app.UseCors("AllowAllOrigins"); // Enable CORS policy
 
 app.UseCookiePolicy(); // Apply the cookie policy
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
 

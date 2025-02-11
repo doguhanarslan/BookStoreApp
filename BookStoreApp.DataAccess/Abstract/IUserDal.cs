@@ -8,11 +8,11 @@ using BookStoreApp.Entities.Concrete;
 
 namespace BookStoreApp.DataAccess.Abstract
 {
-    public interface IUserDal: IEntityRepository<User>
+    public interface IUserDal : IEntityRepository<User>
     {
-        User? GetById(int id);
+        User? GetById(Guid id);
 
-        User? GetUser(string userName,string password);
+        User? GetUser(string userName, string password);
 
         User? GetUserByUserName(string userName);
 

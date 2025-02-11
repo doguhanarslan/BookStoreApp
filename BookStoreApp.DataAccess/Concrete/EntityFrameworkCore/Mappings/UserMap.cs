@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore.Mappings
 {
-    public class UserMap:IEntityTypeConfiguration<User>
+    public class UserMap : IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
@@ -20,9 +20,8 @@ namespace BookStoreApp.DataAccess.Concrete.EntityFrameworkCore.Mappings
             builder.Property(u => u.FirstName).HasColumnName("FirstName");
             builder.Property(u => u.LastName).HasColumnName("LastName");
             builder.Property(u => u.Email).HasColumnName("Email");
-            builder.Property(u => u.Password).HasColumnName("Password");
+            builder.Property(u => u.PasswordHash).HasColumnName("PasswordHash");
             builder.Property(u => u.ProfileImage).HasColumnName("ProfileImage");
-
         }
     }
 }

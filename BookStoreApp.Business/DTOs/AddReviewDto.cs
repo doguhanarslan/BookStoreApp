@@ -11,7 +11,7 @@ namespace BookStoreApp.Business.DTOs
         public int Id { get; set; }
         public int BookId { get; set; }
 
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         public string UserName { get; set; }
         public string ReviewText { get; set; }
         public int Rating { get; set; }
